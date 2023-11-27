@@ -1,0 +1,1 @@
+2023-11-15,[{"image":"https://flagcdn.com/gw.svg","name":"Guinée-Bissau"},{"image":"https://flagcdn.com/mg.svg","name":"Madagascar"},{"image":"https://flagcdn.com/pr.svg","name":"Porto Rico"}]
