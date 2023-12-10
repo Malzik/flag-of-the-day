@@ -4,7 +4,7 @@ import React from 'react';
 const GuessesComponent = ({ guesses }) => {
 
     return (
-        <div className={'flex flex-col'}>
+        <div className={'flex flex-col text-left m-5'}>
             {guesses.map((guess: string, index: number) => (
                 <span key={index}>{guess}</span>
             ))}

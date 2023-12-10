@@ -1,8 +1,10 @@
 // src/components/Header.tsx
 import React, { useState } from 'react';
 import useDarkSide from "../../utils/useDarkSide";
+import {NavLink, useNavigate} from "react-router-dom";
 
 const Header: React.FC = () => {
+    let navigate = useNavigate();
     const [colorTheme, setTheme] = useDarkSide();
     const [darkSide, setDarkSide] = useState(colorTheme === 'light');
 
@@ -14,10 +16,12 @@ const Header: React.FC = () => {
     return (
         <header className="text-white p-2 flex justify-between items-center">
             <div className={'grow flex items-center justify-center'}>
-                <img src="planete.png" alt="Planete" className="h-10 w-10" />
+                <NavLink to="/">
+                    <img src="planete.png" alt="Planete" className="h-10 w-10" onClick={()=> navigate("/game")} />
+                </NavLink>
             </div>
             <div
-                className="cursor-pointer absolute inset-y-1 right-2"
+                className="cursor-pointer absolute inset-y-1 right-2 max-h-12"
                 onClick={toggleDarkMode}
             >
                 {darkSide ? (

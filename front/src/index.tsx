@@ -6,14 +6,47 @@ import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import {Provider} from "react-redux";
 import store from "./store/store";
+import {createBrowserRouter, RouterProvider} from "react-router-dom";
+import {Template} from "./component/template/Template";
+import FlagComponent from "./component/flag/flag";
+import HomeComponent, {loader} from "./component/home/home";
+import WinComponent from "./component/win/win";
+import LooseComponent from "./component/loose/loose";
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+    document.getElementById('root') as HTMLElement
 );
+
+const router = createBrowserRouter([
+    {
+        element: <Template />,
+        children: [
+            {
+                path: "",
+                element: <HomeComponent/>,
+            },
+            {
+                path: "/game",
+                element: <FlagComponent/>,
+                loader: loader
+            },
+            {
+                path: "/win",
+                element: <WinComponent/>,
+                loader: loader
+            },
+            {
+                path: "/loose",
+                element: <LooseComponent/>,
+                loader: loader
+            }
+        ]
+    }
+]);
 root.render(
-  <Provider store={store}>
-    <App />
-  </Provider>
+    <Provider store={store}>
+        <RouterProvider router={router} />
+    </Provider>
 );
 
 // If you want your app to work offline and load faster, you can change

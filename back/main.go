@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/text/unicode/norm"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -79,55 +81,60 @@ func DrawThreeRandomFlags() []Flag {
 	return copiedFlags[:3]
 }
 
-// SaveFlagsToFile saves the drawn flags and the date to a text file
-func SaveFlagsToFile(flags []Flag, filename string) error {
-	// Open the file for writing, creating it if it doesn't exist
-	file, err := os.Create(filename)
+func AppendCSV(filename string, flags []Flag) error {
+	file, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	// Write the date to the file
-	_, err = file.WriteString(time.Now().Format("2006-01-02") + ",")
-	if err != nil {
-		return err
-	}
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
 
-	// Marshal the flags to JSON
+	currentDate := time.Now().Format("2006-01-02")
+	row := []string{currentDate}
+
 	flagsJSON, err := json.Marshal(flags)
 	if err != nil {
 		return err
 	}
 
-	// Write the flags as JSON to the file
-	_, err = file.Write(flagsJSON)
+	row = append(row, string(flagsJSON))
+
+	err = writer.Write(row)
 	if err != nil {
 		return err
 	}
 
+	fmt.Printf("New line for %s as been inserted\n", currentDate)
 	return nil
 }
 
 // CheckIfFlagsExistForToday checks if flags for the current date have already been saved
 func CheckIfFlagsExistForToday(filename string) ([]Flag, error) {
-	fileContent, err := ioutil.ReadFile(filename)
+	file, err := os.Open(filename)
 	if err != nil {
-		// If the file doesn't exist, treat it as if flags for today do not exist
-		return nil, nil
+		return nil, err
 	}
+	defer file.Close()
 
-	// Split the file content into lines
-	lines := strings.Split(string(fileContent), "\n")
+	// Créer un reader CSV à partir du fichier
+	reader := csv.NewReader(file)
+
+	// Lire toutes les lignes du fichier
+	allRows, err := reader.ReadAll()
+	if err != nil {
+		return nil, err
+	}
 
 	var flags []Flag
 	// Iterate over each line
-	for _, line := range lines {
+	for _, line := range allRows {
 		if len(line) == 0 {
 			continue
 		}
 		// Extract the date from the line
-		dateString := strings.TrimSpace(line[:10])
+		dateString := strings.TrimSpace(line[0])
 
 		// Parse the date string
 		date, err := time.Parse("2006-01-02", dateString)
@@ -139,7 +146,7 @@ func CheckIfFlagsExistForToday(filename string) ([]Flag, error) {
 		today := time.Now().Format("2006-01-02") == date.Format("2006-01-02")
 		if today {
 			// Extract the flags from the line
-			flagsJSON := line[11:]
+			flagsJSON := line[1]
 			err := json.Unmarshal([]byte(flagsJSON), &flags)
 			if err != nil {
 				return nil, err
@@ -149,13 +156,12 @@ func CheckIfFlagsExistForToday(filename string) ([]Flag, error) {
 		}
 	}
 
-	print(flags)
 	if len(flags) == 0 {
 		// Flags for today do not exist, so draw three new flags and save them
 		flags := DrawThreeRandomFlags()
 		fmt.Println("Random Flags:", flags)
 
-		err := SaveFlagsToFile(flags, "drawn_flags.txt")
+		err := AppendCSV("drawn_flags.csv", flags)
 		if err != nil {
 			fmt.Println("Error saving flags to file:", err)
 			return nil, err
@@ -167,7 +173,7 @@ func CheckIfFlagsExistForToday(filename string) ([]Flag, error) {
 
 func handleStartGuess(c *gin.Context) {
 	// Check if flags for today already exist
-	flags, err := CheckIfFlagsExistForToday("drawn_flags.txt")
+	flags, err := CheckIfFlagsExistForToday("drawn_flags.csv")
 	if err != nil {
 		fmt.Println("Error checking if flags exist for today:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
@@ -183,7 +189,7 @@ func handleStartGuess(c *gin.Context) {
 
 func handleGuess(c *gin.Context) {
 	// Check if flags for today already exist
-	flags, err := CheckIfFlagsExistForToday("drawn_flags.txt")
+	flags, err := CheckIfFlagsExistForToday("drawn_flags.csv")
 	if err != nil {
 		fmt.Println("Error checking if flags exist for today:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
@@ -209,6 +215,7 @@ func checkGuess(flags []Flag, step int, guess string) bool {
 	// This is a placeholder implementation, replace it with your actual logic
 	return cleanAndCapitalize(flags[step].Name) == cleanAndCapitalize(guess)
 }
+
 func cleanAndCapitalize(input string) string {
 	normalized := norm.NFD.String(input)
 
@@ -223,31 +230,37 @@ func cleanAndCapitalize(input string) string {
 	// Capitalize the guess
 	return strings.ToLower(cleanedGuess.String())
 }
+
 func main() {
+	csvFile, err := os.OpenFile("access.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatalf("failed creating file: %s", err)
+	}
+	csvFile.Close()
 	// Create a new Gin router
 	r := gin.Default()
 
-	r.SetTrustedProxies([]string{"localhost:3000"})
+	r.SetTrustedProxies([]string{"localhost:3000", "http://flag-of-the-day.localhost", "flag-of-the-day.localhost"})
 	r.Use(func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Next()
 	})
 
 	r.OPTIONS("/*any", func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
+		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Status(204)
 	})
 
 	// Define the /guess endpoint
-	r.GET("/startGuess", handleStartGuess)
+	r.GET("/api/startGuess", handleStartGuess)
 
 	// Define the /guess endpoint
-	r.POST("/guess", handleGuess)
+	r.POST("/api/guess", handleGuess)
 
 	// Start the HTTP server on port 8080
-	r.Run(":8080")
+	r.Run(":8082")
 }

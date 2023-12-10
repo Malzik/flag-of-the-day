@@ -2,6 +2,7 @@
 import {Dispatch} from "redux";
 import {Flag} from "../model/flag";
 
+const apiUrl = process.env.REACT_APP_API_URL
 // Define action types
 export const FETCH_FLAGS_REQUEST = 'FETCH_FLAGS_REQUEST';
 export const FETCH_FLAGS_SUCCESS = 'FETCH_FLAGS_SUCCESS';
@@ -12,6 +13,7 @@ export const GUESS_FAILURE = 'GUESS_FAILURE';
 export const START_GUESS_REQUEST = 'START_GUESS_REQUEST';
 export const START_GUESS_SUCCESS = 'START_GUESS_SUCCESS';
 export const START_GUESS_FAILURE = 'START_GUESS_FAILURE';
+export const UPDATE_STEP = 'UPDATE_STEP';
 
 // Define action creators
 const fetchFlagsRequest = () => ({
@@ -31,9 +33,10 @@ const fetchFlagsFailure = (error: string) => ({
 const guessRequest = () => ({
     type: GUESS_REQUEST,
 });
-const guessSuccess = (data: Flag[]) => ({
+const guessSuccess = (data: {correctGuess: boolean}, name: string) => ({
     type: GUESS_SUCCESS,
-    payload: data,
+    correctGuess: data.correctGuess,
+    answer: name
 });
 
 const guessFailure = (error: string) => ({
@@ -52,6 +55,11 @@ const startGuessSuccess = (data: Flag[]) => ({
 const startGuessFailure = (error: string) => ({
     type: START_GUESS_FAILURE,
     payload: error,
+});
+
+export const updateStep = (newStep: number) => ({
+    type: UPDATE_STEP,
+    step: newStep,
 });
 
 // Async action creator using redux-thunk
@@ -74,7 +82,7 @@ export const getFlagOfTheDay = () => {
         dispatch(startGuessRequest());
 
         try {
-            const response = await fetch('http://localhost:8080/startGuess');
+            const response = await fetch(apiUrl + '/startGuess');
             const data = await response.json();
             dispatch(startGuessSuccess(data));
         } catch (error: any) {
@@ -88,7 +96,7 @@ export const guess = (step: number, name: string) => {
         dispatch(guessRequest());
 
         try {
-            const response = await fetch('http://localhost:8080/guess', {
+            const response = await fetch(apiUrl + '/guess', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -97,7 +105,7 @@ export const guess = (step: number, name: string) => {
                 body: JSON.stringify({step, name})
             });
             const data = await response.json();
-            dispatch(guessSuccess(data));
+            dispatch(guessSuccess(data, name));
         } catch (error: any) {
             dispatch(guessFailure(error.message));
         }

@@ -1,0 +1,63 @@
+version: '3'
+
+services:
+  reverse-proxy:
+    image: traefik:v2.10.7
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    networks:
+      - traefik_webgateway
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  whoami:
+    # A container that exposes an API to show its IP address
+    image: traefik/whoami
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.localhost`)"
+    networks:
+      - traefik_webgateway
+
+  fotd-front:
+    container_name: 'fotd-front'
+    build:
+      context: ./front
+    depends_on: [reverse-proxy]
+    networks:
+      - traefik_webgateway
+    ports:
+      - "3000:80"
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.fotd-front.rule=Host(`fotd.localhost`)'
+      - "traefik.http.routers.fotd-front.entrypoints=web"
+      - 'traefik.http.services.fotd-front.loadbalancer.server.port=80'
+      - "traefik.docker.network=traefik_webgateway"
+
+  fotd-api:
+    container_name: 'fotd-api'
+    build:
+      context: ./back
+    depends_on: [reverse-proxy]
+    networks:
+      - traefik_webgateway
+    ports:
+      - "8082:8082"
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.fotd-api.rule=Host(`fotd.localhost`) && PathPrefix(`/api`)'
+      - "traefik.http.routers.fotd-api.entrypoints=web"
+      - 'traefik.http.services.fotd-api.loadbalancer.server.port=8082'
+      - "traefik.docker.network=traefik_webgateway"
+
+networks:
+  traefik_webgateway:
+    external: true
