@@ -27,12 +27,12 @@ const LooseComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers }) => {
 
     useEffect(() => {
         setProfile({...profile, streak: 0})
-        setCurrentDay({...currentDay, [today]: {...currentDay[today], 'loose': true}})
+        setCurrentDay({...currentDay, [today]: {...currentDay[today], additionalInfo: {loose: true}}})
     }, []);
 
     const getFlagName = (step: number) => {
-        if (currentDay[today] && currentDay[today][step]) {
-            return currentDay[today][step].flagName
+        if (currentDay[today] && currentDay[today].guessed[step]) {
+            return currentDay[today].guessed[step].flagName
         }
         return '?'
     }

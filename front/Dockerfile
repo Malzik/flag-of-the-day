@@ -17,6 +17,7 @@ WORKDIR /usr/share/nginx/html
 RUN rm -rf ./*
 
 COPY --from=build-stage /app/build .
+COPY --from=build-stage /app/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
