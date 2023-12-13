@@ -23,7 +23,9 @@ services:
       context: ./back
     depends_on: [reverse-proxy]
     volumes:
-      - ./drawn_flags.csv:drawn_flags.csv
+      - type: bind
+        source: ./drawn_flags.csv
+        target: /usr/src/app/drawn_flags.csv
     networks:
       - traefik_webgateway
     ports:
