@@ -24,10 +24,6 @@ services:
       context: ./back
     depends_on: [reverse-proxy]
     restart: unless-stopped
-    volumes:
-      - type: bind
-        source: ./drawn_flags.csv
-        target: /usr/src/app/drawn_flags.csv
     networks:
       - traefik_webgateway
     ports:
