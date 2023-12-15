@@ -9,12 +9,19 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
+      - "--certificatesresolvers.le.acme.httpchallenge=true"
+      - "--certificatesResolvers.le.acme.httpChallenge.entryPoint=web"
+      - "--certificatesResolvers.le.acme.email=a.heroin@outlook.fr"
+      - "--certificatesResolvers.le.acme.storage=/letsencrypt/acme.json"
     networks:
       - traefik_webgateway
     ports:
       - "80:80"
+      - '443:443'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik/letsencrypt:/letsencrypt
 
 networks:
   traefik_webgateway:

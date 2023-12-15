@@ -17,6 +17,17 @@ services:
       - "traefik.http.routers.fotd-front.entrypoints=web"
       - 'traefik.http.services.fotd-front.loadbalancer.server.port=80'
       - "traefik.docker.network=traefik_webgateway"
+      - "traefik.http.middlewares.force_https.redirectscheme.scheme=https"
+      - 'traefik.http.routers.front.tls=false'
+      - 'traefik.http.routers.front.middlewares=fotd-front'
+      - 'traefik.http.middlewares.front.chain.middlewares=force_https'
+      - 'traefik.http.routers.front.service=fotd-front'
+
+      - 'traefik.http.routers.front-tls.rule=Host(`flags.alexis-heroin.ca`)'
+      - 'traefik.http.routers.front-tls.tls=true'
+      - "traefik.http.routers.front-tls.tls.certresolver=le"
+      - 'traefik.http.routers.front-tls.service=front-tls'
+      - "traefik.http.services.front-tls.loadbalancer.server.port=80"
 
   fotd-api:
     container_name: 'fotd-api'
@@ -34,6 +45,18 @@ services:
       - "traefik.http.routers.fotd-api.entrypoints=web"
       - 'traefik.http.services.fotd-api.loadbalancer.server.port=8082'
       - "traefik.docker.network=traefik_webgateway"
+      - "traefik.http.middlewares.force_https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.rewrite_url.stripprefix.prefixes=/api"
+      - "traefik.http.middlewares.rewrite_url.stripprefix.forceslash=true"
+      - 'traefik.http.middlewares.fotd-api.chain.middlewares=force_https, rewrite_url'
+
+      - 'traefik.http.routers.api-tls.rule=Host(`flags.alexis-heroin.ca`) && PathPrefix(`/api/`)'
+      - 'traefik.http.routers.api-tls.tls=true'
+      - 'traefik.http.routers.api-tls.middlewares=rewrite_url'
+      - "traefik.http.routers.api-tls.tls.certresolver=le"
+      - 'traefik.http.routers.api-tls.service=api-tls'
+      - "traefik.http.services.api-tls.loadbalancer.server.port=8082"
+      - 'traefik.http.middlewares.api-tls.chain.middlewares=rewrite_url'
 
 networks:
   traefik_webgateway:
