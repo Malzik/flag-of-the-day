@@ -13,15 +13,15 @@ services:
       - "3000:80"
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.fotd-front.rule=Host(`flags.alexis-heroin.ca`)'
-      - "traefik.http.routers.fotd-front.entrypoints=web"
-      - 'traefik.http.services.fotd-front.loadbalancer.server.port=80'
       - "traefik.docker.network=traefik_webgateway"
       - "traefik.http.middlewares.force_https.redirectscheme.scheme=https"
+
+      - 'traefik.http.routers.fotd-front.rule=Host(`flags.alexis-heroin.ca`)'
       - 'traefik.http.routers.front.tls=false'
-      - 'traefik.http.routers.front.middlewares=fotd-front'
-      - 'traefik.http.middlewares.front.chain.middlewares=force_https'
-      - 'traefik.http.routers.front.service=fotd-front'
+      - 'traefik.http.routers.fotd-front.middlewares=fotd-front'
+      - 'traefik.http.middlewares.fotd-front.chain.middlewares=force_https'
+      - 'traefik.http.routers.fotd-front.service=fotd-front'
+      - 'traefik.http.services.fotd-front.loadbalancer.server.port=80'
 
       - 'traefik.http.routers.front-tls.rule=Host(`flags.alexis-heroin.ca`)'
       - 'traefik.http.routers.front-tls.tls=true'
@@ -41,13 +41,15 @@ services:
       - "8082:8082"
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.fotd-api.rule=Host(`flags.alexis-heroin.ca`) && PathPrefix(`/api`)'
-      - "traefik.http.routers.fotd-api.entrypoints=web"
-      - 'traefik.http.services.fotd-api.loadbalancer.server.port=8082'
       - "traefik.docker.network=traefik_webgateway"
       - "traefik.http.middlewares.force_https.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.rewrite_url.stripprefix.prefixes=/api"
       - "traefik.http.middlewares.rewrite_url.stripprefix.forceslash=true"
+
+      - 'traefik.http.routers.fotd-api.rule=Host(`flags.alexis-heroin.ca`) && PathPrefix(`/api/`)'
+      - 'traefik.http.routers.fotd-api.tls=false'
+      - 'traefik.http.routers.fotd-api.service=fotd-api'
+      - 'traefik.http.routers.fotd-api.middlewares=rewrite_url'
+      - 'traefik.http.services.fotd-api.loadbalancer.server.port=8082'
       - 'traefik.http.middlewares.fotd-api.chain.middlewares=force_https, rewrite_url'
 
       - 'traefik.http.routers.api-tls.rule=Host(`flags.alexis-heroin.ca`) && PathPrefix(`/api/`)'
