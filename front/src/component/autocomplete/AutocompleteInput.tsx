@@ -18,7 +18,7 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({ options, onSelect
         // @ts-ignore
         if (listRef.current && !listRef.current.contains(event.target)) {
             setShowOptions(false);
-        } else if (showOptions == false && inputValue.length > 0) {
+        } else if (!showOptions && inputValue.length > 0) {
             setShowOptions(true)
         }
     };
@@ -30,23 +30,6 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({ options, onSelect
         };
     }, [listRef]);
 
-    const compareOptions = (a: string, b: string) => {
-        const aLower = a.toLowerCase();
-        const bLower = b.toLowerCase();
-        const searchLower = inputValue.toLowerCase();
-
-        const aStartsWith = aLower.startsWith(searchLower);
-        const bStartsWith = bLower.startsWith(searchLower);
-
-        if (aStartsWith && !bStartsWith) {
-            return -1;
-        } else if (!aStartsWith && bStartsWith) {
-            return 1;
-        } else {
-            return aLower.localeCompare(bLower);
-        }
-    };
-
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setInputValue(value);
@@ -55,10 +38,24 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({ options, onSelect
         const filtered = options.filter(option =>
             normalizeString(option).includes(normalizeString(value.toLowerCase()))
         );
-        filtered.sort(compareOptions)
+        filtered.sort((a: string, b:string) => {
+            const aLower = a.toLowerCase();
+            const bLower = b.toLowerCase();
+            const searchLower = value.toLowerCase();
+
+            const aStartsWith = aLower.startsWith(searchLower);
+            const bStartsWith = bLower.startsWith(searchLower);
+
+            if (aStartsWith && !bStartsWith) {
+                return -1;
+            } else if (!aStartsWith && bStartsWith) {
+                return 1;
+            } else {
+                return aLower.localeCompare(bLower);
+            }
+        })
         setFilteredOptions(filtered);
 
-        // Show options if there are matches
         setShowOptions(value.length > 0 && filtered.length > 0);
     };
 

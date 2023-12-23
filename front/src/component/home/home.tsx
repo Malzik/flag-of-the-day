@@ -23,13 +23,14 @@ export async function loader() {
         store.dispatch(fetchFlags())
         // @ts-ignore
         store.dispatch(getFlagOfTheDay())
-    }, 1500)
+    }, 50)
 }
 
 const today = new Date().toLocaleDateString("en-US");
 const HomeComponent: React.FC<PropsFromRedux> = ({ maxStep }) => {
     let navigate = useNavigate();
     const [profile, setProfile] = useLocalStorage('profile', '')
+    const [currentDay, setCurrentDay] = useLocalStorage('currentDay', '')
     const [currentLang, setCurrentLang] = useState('fr')
 
     useEffect(() => {
@@ -38,6 +39,13 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ maxStep }) => {
         }
     }, []);
 
+    const startGame = () => {
+        if (!currentDay[today]) {
+            setCurrentDay({[today]: { guessed: [], guesses: [], additionalInfo: {}}})
+        }
+        navigate("/game")
+    }
+
     return (
         <div className={'w-full text-center text-black dark:text-white pt-6'}>
             <div className={'font-extrabold text-4xl'}>
@@ -45,7 +53,7 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ maxStep }) => {
             </div>
             <div className={'mt-36 flex justify-center text-2xl text-black'}>
                 <div className={'flex hover:shadow-inner hover:shadow-2xl dark:bg-slate-100 rounded'}>
-                    <button onClick={()=> navigate("/game")} className={'p-6 rounded-l-lg border border-black dark:border-slate-300 font-semibold'}>
+                    <button onClick={()=> startGame()} className={'p-6 rounded-l-lg border border-black dark:border-slate-300 font-semibold'}>
                         Drapeaux du jour
                     </button>
                     <div className={'p-2 rounded-r-lg border border-black dark:border-slate-300'}>

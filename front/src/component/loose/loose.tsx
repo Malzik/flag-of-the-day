@@ -1,13 +1,9 @@
 // src/components/FlagComponent.tsx
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import { connect, ConnectedProps } from 'react-redux';
-import store, {RootState} from "../../store/store";
+import {RootState} from "../../store/store";
 import {useNavigate} from "react-router-dom";
 import {useLocalStorage} from "../../utils/useLocalStorage";
-import {fetchFlags, getFlagOfTheDay} from "../../store/action/flag";
-import FlameCounter from "../../utils/FlameCounter";
-import ConfettiExplosion from "react-confetti-explosion";
-import {timeout} from "workbox-core/_private";
 const mapStateToProps = (state: RootState) => ({
     randomFlags: state.flag.randomFlags,
     answers: state.flag.answers
@@ -26,15 +22,22 @@ const LooseComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers }) => {
     const [profile, setProfile] = useLocalStorage('profile', '')
 
     useEffect(() => {
+        if (!currentDay[today] || !currentDay[today].additionalInfo || !currentDay[today].additionalInfo.loose) {
+            navigate('/')
+            return
+        }
         setProfile({...profile, streak: 0})
-        setCurrentDay({...currentDay, [today]: {...currentDay[today], additionalInfo: {loose: true}}})
     }, []);
 
     const getFlagName = (step: number) => {
-        if (currentDay[today] && currentDay[today].guessed[step]) {
+        if (currentDay[today] && currentDay[today].guessed && currentDay[today].guessed[step]) {
             return currentDay[today].guessed[step].flagName
         }
         return '?'
+    }
+
+    if (!currentDay[today] || !currentDay[today].additionalInfo || !currentDay[today].additionalInfo.loose) {
+        return (<div></div>)
     }
 
     return (
@@ -43,7 +46,7 @@ const LooseComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers }) => {
                 <h2 className={'font-bold text-4xl flex justify-center'}>
                     DEFAITE
                 </h2>
-                <span>Vous avez trouvez {currentDay[today].steps} drapeaux sur 3</span>
+                <span>Vous avez trouvez {currentDay[today].guessed ? currentDay[today].guessed.length : 0} drapeaux sur 3</span>
             </div>
             <div className={'flex justify-center'}>
                 {randomFlags.map((flag: string, index) => (

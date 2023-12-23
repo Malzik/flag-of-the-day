@@ -1,12 +1,10 @@
-// src/components/FlagComponent.tsx
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import { connect, ConnectedProps } from 'react-redux';
-import store, {RootState} from "../../store/store";
+import {RootState} from "../../store/store";
 import {useNavigate} from "react-router-dom";
 import {useLocalStorage} from "../../utils/useLocalStorage";
-import {fetchFlags, getFlagOfTheDay} from "../../store/action/flag";
-import FlameCounter from "../../utils/FlameCounter";
 import ConfettiExplosion from "react-confetti-explosion";
+
 const mapStateToProps = (state: RootState) => ({
     randomFlags: state.flag.randomFlags,
     answers: state.flag.answers
@@ -21,15 +19,18 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 const today = new Date().toLocaleDateString("en-US");
 const WinComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers }) => {
     const navigate = useNavigate()
-    const [currentDay, setCurrentDay] = useLocalStorage('currentDay', '')
-    const [profile, setProfile] = useLocalStorage('profile', '')
+    const [currentDay] = useLocalStorage('currentDay', '')
 
     useEffect(() => {
-        if (!currentDay[today].win) {
-            setProfile({...profile, streak: profile.streak+1})
-            setCurrentDay({...currentDay, [today]: {...currentDay[today], 'win': true}})
+        if (!currentDay[today] || !currentDay[today].additionalInfo || !currentDay[today].additionalInfo.win) {
+            navigate('/')
+            return
         }
     }, []);
+
+    if (!currentDay[today] || !currentDay[today].additionalInfo || !currentDay[today].additionalInfo.win) {
+        return (<div></div>)
+    }
 
     const getFlagName = (step: number) => {
         if (currentDay[today] && currentDay[today].guessed[step]) {

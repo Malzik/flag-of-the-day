@@ -1,6 +1,3 @@
-// src/reducers/counter.ts
-import {Flag} from "../model/flag";
-
 interface FlagState {
     flags: any;
     randomFlags: string[]
@@ -9,7 +6,9 @@ interface FlagState {
     step: number;
     maxStep: number;
     correctGuess: {[key: number]: boolean};
-    answers: string[]
+    answers: string[];
+    isWin: boolean;
+    isLoose: boolean;
 }
 
 const initialState: FlagState = {
@@ -24,7 +23,9 @@ const initialState: FlagState = {
         0: false,
         1: false,
         2: false
-    }
+    },
+    isWin: false,
+    isLoose: false
 };
 
 const flagReducer = (state = initialState, action: any): FlagState => {
@@ -40,7 +41,11 @@ const flagReducer = (state = initialState, action: any): FlagState => {
             if (action.correctGuess) {
                 answers.push(action.answer)
             }
-            return { ...state, loading: false, correctGuess: { ...state.correctGuess, [state.step]: action.correctGuess}, answers };
+            let isWin = false
+            if (state.step === state.maxStep - 1 && action.correctGuess) {
+                isWin = true
+            }
+            return { ...state, loading: false, correctGuess: { ...state.correctGuess, [state.step]: action.correctGuess}, answers, isWin };
         }
         case 'START_GUESS_SUCCESS':
             return { ...state, loading: false, randomFlags: action.payload.images };

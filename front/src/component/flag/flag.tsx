@@ -5,8 +5,6 @@ import {RootState} from "../../store/store";
 import {fetchFlags, getFlagOfTheDay, guess, updateStep} from "../../store/action/flag";
 import GuessesComponent from "./guesses/guesses";
 import AutocompleteInput from '../autocomplete/AutocompleteInput';
-import {Flag} from "../../store/model/flag";
-import ConfettiExplosion from "react-confetti-explosion";
 import {useLocalStorage} from "../../utils/useLocalStorage";
 import {useNavigate} from "react-router-dom";
 
@@ -17,7 +15,8 @@ const mapStateToProps = (state: RootState) => ({
     maxStep: state.flag.maxStep,
     randomFlags: state.flag.randomFlags,
     step: state.flag.step,
-    correctGuess: state.flag.correctGuess
+    correctGuess: state.flag.correctGuess,
+    isWin: state.flag.isWin
 });
 
 const mapDispatchToProps = {
@@ -32,10 +31,12 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 const today = new Date().toLocaleDateString("en-US");
 
-const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, maxStep, correctGuess, loading, error, getFlagOfTheDay, fetchFlags, guess, updateStep }) => {
+// @ts-ignore
+const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, correctGuess, isWin, loading, error, getFlagOfTheDay, fetchFlags, guess, updateStep }) => {
     const [flagName, setFlagName] = useState("")
     const [guesses, setGuesses] = useState<string[]>([])
-    const [currentDay, setCurrentDay] = useLocalStorage('currentDay', '')
+    const [currentDay, setCurrentDay] = useLocalStorage('currentDay', undefined)
+    const [profile, setProfile] = useLocalStorage('profile', '')
     const navigate = useNavigate()
 
     const maxGuesses = 5
@@ -44,48 +45,54 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, max
         options = flags.map((flag: any) => flag.name).filter((option: any) => !guesses.includes(option))
     }
 
-    setTimeout(() => {
-        if(currentDay[today] && currentDay[today].guessed.length === 3) {
-            navigate('/win')
-        }
-    })
+    useEffect(() => {
+        setTimeout(() => {
+            if (!currentDay[today]) {
+                navigate('/')
+                return
+            }
+            setGuesses(currentDay[today].guesses)
+            updateStep(currentDay[today].guessed.length)
+        })
+    });
 
     useEffect(() => {
-        getFlagOfTheDay();
-        fetchFlags();
-        if (currentDay[today]) {
-            if (currentDay[today].guessed) {
-                updateStep(currentDay[today].guessed.length)
+        if (!loading) {
+            if (flagName.length > 0 && correctGuess[step]) {
+                setCurrentDay({...currentDay, [today]: {...currentDay[today], guesses: [], guessed:  [...currentDay[today].guessed, {step, flagName}]}})
+                updateStep(step + 1)
+                setGuesses([])
             }
-            if (currentDay[today].additionalInfo) {
-                if (currentDay[today].additionalInfo.loose) {
-                    navigate('/loose')
-                }
-                if (currentDay[today].additionalInfo.win) {
-                    navigate('/win')
-                }
+            if(!correctGuess[step] && guesses.length === maxGuesses) {
+                setCurrentDay({...currentDay, [today]: {...currentDay[today], additionalInfo: {loose: true}}})
             }
         }
-    }, [fetchFlags, getFlagOfTheDay]);
+    }, [correctGuess, loading]);
 
-    const sendGuess = (name: string) => {
-        setGuesses([...guesses, name])
-        guess(step, name)
-    }
+    useEffect(() => {
+        if (!currentDay[today]) {
+            return
+        }
+        if (isWin && !currentDay[today].additionalInfo.win) {
+            setProfile({...profile, streak: profile.streak+1})
+            setCurrentDay({...currentDay, [today]: {...currentDay[today], additionalInfo: {win: true}, guesses: [], guessed:  [...currentDay[today].guessed, {step, flagName}]}})
+        }
+
+        if (currentDay[today].additionalInfo.win) {
+            navigate('/win')
+        }
+
+        if (currentDay[today].additionalInfo.loose) {
+            navigate('/loose')
+        }
+    }, [isWin, currentDay])
 
     const updateFlagName = (newFlagName: string) => {
         if (newFlagName.length > 0) {
             setFlagName(newFlagName)
-            sendGuess(newFlagName)
-        }
-    }
-
-    const setItemInLocalStorage = (step: number, flagName: string) => {
-        if (currentDay[today]) {
-            const guessed = [...currentDay[today].guessed, {step, flagName}]
-            setCurrentDay({...currentDay, [today]: {...currentDay[today], guessed}})
-        } else {
-            setCurrentDay({...currentDay, [today]: {guessed: [{step, flagName}]}})
+            setGuesses([...guesses, newFlagName])
+            setCurrentDay({...currentDay, [today]: {...currentDay[today], guesses: [...guesses, newFlagName]}})
+            guess(step, newFlagName)
         }
     }
 
@@ -100,18 +107,6 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, max
     if (!flags || randomFlags.length === 0) {
         return null;
     }
-
-    setTimeout(() => {
-        if(guesses.length === maxGuesses) {
-            navigate('/loose')
-            return
-        }
-        if (correctGuess[step]) {
-            setItemInLocalStorage(step, flagName)
-            updateStep(step + 1)
-            setGuesses([])
-        }
-    }, 50)
 
     const getGuessedFlags = () => {
         const result = []
