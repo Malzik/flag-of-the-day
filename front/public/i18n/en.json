@@ -1,0 +1,21 @@
+{
+  "home": {
+    "title": "FLAG OF THE DAY",
+    "startGame": "Start the game"
+  },
+  "game": {
+    "flagAlt": "Flag to guess, if you see this, an error occured",
+    "guessedFlagAlt": "Guessed flag, if you see this, an error occured",
+    "search": "Search..."
+  },
+  "looser": {
+    "title": "YOU LOOSE",
+    "result": "You found {flags} flags on 3"
+  },
+  "win": {
+    "title": "VICTORY"
+  },
+  "loading": "Loading...",
+  "backToMenu": "Back to menu",
+  "error": "An error occured: {error}"
+}

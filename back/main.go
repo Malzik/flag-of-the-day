@@ -18,14 +18,16 @@ import (
 
 // Flag represents the structure of a flag
 type Flag struct {
-	Image string `json:"image"`
-	Name  string `json:"name"`
+	Code  string            `json:"code"`
+	Image string            `json:"image"`
+	Names map[string]string `json:"name"`
 }
 
 // GuessRequest represents the structure of the incoming JSON payload for the guess endpoint
 type GuessRequest struct {
 	CurrentStep int    `json:"step"`
 	Guess       string `json:"name"`
+	Lang        string `json:"lang"`
 }
 
 // GuessResponse represents the structure of the JSON response
@@ -203,17 +205,17 @@ func handleGuess(c *gin.Context) {
 	}
 
 	// Perform the logic to check if the guess is correct
-	isCorrect := checkGuess(flags, guessRequest.CurrentStep, guessRequest.Guess)
+	isCorrect := checkGuess(flags, guessRequest.CurrentStep, guessRequest.Guess, guessRequest.Lang)
 
 	// Prepare the response
 	response := GuessResponse{CorrectGuess: isCorrect}
 	c.JSON(http.StatusOK, response)
 }
 
-func checkGuess(flags []Flag, step int, guess string) bool {
+func checkGuess(flags []Flag, step int, guess string, lang string) bool {
 	// Implement your logic to check if the guess is correct
 	// This is a placeholder implementation, replace it with your actual logic
-	return cleanAndCapitalize(flags[step].Name) == cleanAndCapitalize(guess)
+	return cleanAndCapitalize(flags[step].Names[lang]) == cleanAndCapitalize(guess)
 }
 
 func cleanAndCapitalize(input string) string {

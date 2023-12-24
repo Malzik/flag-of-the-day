@@ -1,0 +1,21 @@
+{
+  "home": {
+    "title": "FLAG OF THE DAY",
+    "startGame": "Drapeaux du jour"
+  },
+  "game": {
+    "flagAlt": "Drapeau à deviner, si vous voyez ce message une erreur est survenue",
+    "guessedFlagAlt": "Drapeau deviné, si vous voyez ce message une erreur",
+    "search": "Rechercher..."
+  },
+  "looser": {
+    "title": "DÉFAITE",
+    "result": "Vous avez trouvez {flags} drapeaux sur 3"
+  },
+  "win": {
+    "title": "VICTOIRE"
+  },
+  "loading": "Chargement",
+  "backToMenu": "Retour au menu",
+  "error": "Une erreur est survenue: {error}"
+}

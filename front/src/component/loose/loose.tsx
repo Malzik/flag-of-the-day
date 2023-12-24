@@ -4,6 +4,7 @@ import { connect, ConnectedProps } from 'react-redux';
 import {RootState} from "../../store/store";
 import {useNavigate} from "react-router-dom";
 import {useLocalStorage} from "../../utils/useLocalStorage";
+import useTranslations from "../../i18n/useTranslation";
 const mapStateToProps = (state: RootState) => ({
     randomFlags: state.flag.randomFlags,
     answers: state.flag.answers
@@ -20,6 +21,7 @@ const LooseComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers }) => {
     const navigate = useNavigate()
     const [currentDay, setCurrentDay] = useLocalStorage('currentDay', '')
     const [profile, setProfile] = useLocalStorage('profile', '')
+    const {t, status} = useTranslations()
 
     useEffect(() => {
         if (!currentDay[today] || !currentDay[today].additionalInfo || !currentDay[today].additionalInfo.loose) {
@@ -36,17 +38,17 @@ const LooseComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers }) => {
         return '?'
     }
 
-    if (!currentDay[today] || !currentDay[today].additionalInfo || !currentDay[today].additionalInfo.loose) {
-        return (<div></div>)
+    if (status === 'loading' || !currentDay[today] || !currentDay[today].additionalInfo || !currentDay[today].additionalInfo.loose) {
+        return (<div>{t('loading')}</div>)
     }
 
     return (
         <div className={'text-center dark:text-white mt-10 flex flex-col justify-around h-5/6'}>
             <div>
                 <h2 className={'font-bold text-4xl flex justify-center'}>
-                    DEFAITE
+                    {t('looser.title')}
                 </h2>
-                <span>Vous avez trouvez {currentDay[today].guessed ? currentDay[today].guessed.length : 0} drapeaux sur 3</span>
+                <span>{t('looser.result', {flags: currentDay[today].guessed ? currentDay[today].guessed.length : 0})}</span>
             </div>
             <div className={'flex justify-center'}>
                 {randomFlags.map((flag: string, index) => (
@@ -59,7 +61,7 @@ const LooseComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers }) => {
                 ))}
             </div>
             <div className={'mt-10'}>
-                <button onClick={() => navigate('/')}>Retour au menu</button>
+                <button onClick={() => navigate('/')}>{t('backToMenu')}</button>
             </div>
         </div>
     );

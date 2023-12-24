@@ -11,6 +11,7 @@ import FlagComponent from "./component/flag/flag";
 import HomeComponent, {loader} from "./component/home/home";
 import WinComponent from "./component/win/win";
 import LooseComponent from "./component/loose/loose";
+import useTranslations from "./i18n/useTranslation";
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement

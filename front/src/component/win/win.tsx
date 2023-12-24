@@ -4,6 +4,7 @@ import {RootState} from "../../store/store";
 import {useNavigate} from "react-router-dom";
 import {useLocalStorage} from "../../utils/useLocalStorage";
 import ConfettiExplosion from "react-confetti-explosion";
+import useTranslations from "../../i18n/useTranslation";
 
 const mapStateToProps = (state: RootState) => ({
     randomFlags: state.flag.randomFlags,
@@ -20,6 +21,7 @@ const today = new Date().toLocaleDateString("en-US");
 const WinComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers }) => {
     const navigate = useNavigate()
     const [currentDay] = useLocalStorage('currentDay', '')
+    const {t, status} = useTranslations()
 
     useEffect(() => {
         if (!currentDay[today] || !currentDay[today].additionalInfo || !currentDay[today].additionalInfo.win) {
@@ -28,8 +30,8 @@ const WinComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers }) => {
         }
     }, []);
 
-    if (!currentDay[today] || !currentDay[today].additionalInfo || !currentDay[today].additionalInfo.win) {
-        return (<div></div>)
+    if (status === 'loading' || !currentDay[today] || !currentDay[today].additionalInfo || !currentDay[today].additionalInfo.win) {
+        return (<div>{t('loading')}</div>)
     }
 
     const getFlagName = (step: number) => {
@@ -45,7 +47,7 @@ const WinComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers }) => {
             <div className={'text-center dark:text-white mt-10 flex flex-col justify-around h-5/6'}>
                 <div>
                     <h2 className={'font-bold text-4xl flex justify-center'}>
-                        <img src="coupe.svg" alt="Coupe" className={'w-8 color-[#FCDC12]'}/>VICTOIRE<img src="coupe.svg" alt="Coupe" className={'w-8'}/>
+                        <img src="coupe.svg" alt="Coupe" className={'w-8 color-[#FCDC12]'}/>{t('win.title')}<img src="coupe.svg" alt="Coupe" className={'w-8'}/>
                     </h2>
                 </div>
                 <div className={'flex justify-center'}>
@@ -59,7 +61,7 @@ const WinComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers }) => {
                     ))}
                 </div>
                 <div className={'mt-10'}>
-                    <button onClick={() => navigate('/')}>Retour au menu</button>
+                    <button onClick={() => navigate('/')}>{t('backToMenu')}</button>
                 </div>
             </div>
         </>

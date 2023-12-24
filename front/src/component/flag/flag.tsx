@@ -7,6 +7,7 @@ import GuessesComponent from "./guesses/guesses";
 import AutocompleteInput from '../autocomplete/AutocompleteInput';
 import {useLocalStorage} from "../../utils/useLocalStorage";
 import {useNavigate} from "react-router-dom";
+import useTranslations from "../../i18n/useTranslation";
 
 const mapStateToProps = (state: RootState) => ({
     flags: state.flag.flags,
@@ -38,11 +39,12 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, cor
     const [currentDay, setCurrentDay] = useLocalStorage('currentDay', undefined)
     const [profile, setProfile] = useLocalStorage('profile', '')
     const navigate = useNavigate()
+    const {t, status} = useTranslations()
 
     const maxGuesses = 5
     let options: string[] = []
     if (flags) {
-        options = flags.map((flag: any) => flag.name).filter((option: any) => !guesses.includes(option))
+        options = flags.map((flag: any) => flag.name[profile.lang]).filter((option: any) => !guesses.includes(option))
     }
 
     useEffect(() => {
@@ -92,16 +94,16 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, cor
             setFlagName(newFlagName)
             setGuesses([...guesses, newFlagName])
             setCurrentDay({...currentDay, [today]: {...currentDay[today], guesses: [...guesses, newFlagName]}})
-            guess(step, newFlagName)
+            guess(step, newFlagName, profile.lang)
         }
     }
 
-    if (loading) {
-        return <p>Loading...</p>;
+    if (status === 'loading' || loading) {
+        return <p>{t('loading')}</p>;
     }
 
     if (error) {
-        return <p>Error: {error}</p>;
+        return <p>{t('error', {error})}</p>;
     }
 
     if (!flags || randomFlags.length === 0) {
@@ -125,7 +127,7 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, cor
             <div className={'flex justify-center'}>
                 {getGuessedFlags().map((flag: any, index) => (
                     <div key={index} className={'mx-2 my-6 w-20'}>
-                        {flag.length > 0 ? <img src={flag} alt="Flag guessed" className={'border'}/> : <div></div>}
+                        {flag.length > 0 ? <img src={flag} alt={t('game.guessedFlagAlt')} className={'border'}/> : <div></div>}
                     </div>
                 ))}
             </div>
@@ -135,7 +137,7 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, cor
                         className={'px-4 md:w-96'}
                         src={randomFlags[step]}
                         height="120"
-                        alt="Flag to guess" />
+                        alt={t('game.flagAlt')} />
                     <div className={'flex  mt-4'}>
                         <AutocompleteInput options={options} onSelect={(option) => updateFlagName(option)} />
                         <div>({guesses.length + 1} / {maxGuesses})</div>

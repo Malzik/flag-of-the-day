@@ -2,6 +2,7 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 import normalizeString from "../../utils/normalize";
+import useTranslations from "../../i18n/useTranslation";
 
 interface AutocompleteInputProps {
     options: string[];
@@ -13,6 +14,7 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({ options, onSelect
     const [showOptions, setShowOptions] = useState<boolean>(false);
     const [filteredOptions, setFilteredOptions] = useState<string[]>(options.sort());
     const listRef = useRef();
+    const {t} = useTranslations()
 
     const handleClickOutside = (event: Event) => {
         // @ts-ignore
@@ -84,7 +86,7 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({ options, onSelect
                 }}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                placeholder="Rechercher..."
+                placeholder={t('game.search')}
                 autoFocus
             />
 

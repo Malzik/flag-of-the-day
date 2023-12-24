@@ -91,7 +91,7 @@ export const getFlagOfTheDay = () => {
     };
 };
 
-export const guess = (step: number, name: string) => {
+export const guess = (step: number, name: string, lang: string) => {
     return async (dispatch: Dispatch) => {
         dispatch(guessRequest());
 
@@ -102,7 +102,7 @@ export const guess = (step: number, name: string) => {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({step, name})
+                body: JSON.stringify({step, name, lang})
             });
             const data = await response.json();
             dispatch(guessSuccess(data, name));
