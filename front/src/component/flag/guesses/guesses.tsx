@@ -1,10 +1,12 @@
-// src/components/FlagComponent.tsx
 import React from 'react';
-// @ts-ignore
-const GuessesComponent = ({ guesses }) => {
+
+interface GuessesComponentProps {
+    guesses: string[];
+}
+const GuessesComponent: React.FC<GuessesComponentProps> = ({ guesses }) => {
 
     return (
-        <div className={'flex flex-col text-left m-5'}>
+        <div className={'flex flex-col m-5 max-w-20'}>
             {guesses.map((guess: string, index: number) => (
                 <span key={index}>{guess}</span>
             ))}

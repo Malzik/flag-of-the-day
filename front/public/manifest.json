@@ -1,6 +1,7 @@
 {
   "short_name": "FOTD",
   "name": "Flag of the Day",
+  "description": "Flag of the Day",
   "icons": [
     {
       "src": "favicon.ico",
@@ -9,12 +10,17 @@
     },
     {
       "src": "planete.png",
+      "sizes": "192x",
+      "type": "image/png"
+    },
+    {
+      "src": "planete.png",
       "type": "image/png",
       "sizes": "512x512"
     }
   ],
   "start_url": ".",
-  "display": "standalone",
+  "display": "fullscreen",
   "theme_color": "#000000",
   "background_color": "#ffffff"
 }

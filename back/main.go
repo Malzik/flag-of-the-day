@@ -21,21 +21,24 @@ type Flag struct {
 	Code  string            `json:"code"`
 	Image string            `json:"image"`
 	Names map[string]string `json:"name"`
+	Hints map[string]string `json:"hints"`
 }
 
 // GuessRequest represents the structure of the incoming JSON payload for the guess endpoint
 type GuessRequest struct {
 	CurrentStep int    `json:"step"`
+	Try         int    `json:"try"`
 	Guess       string `json:"name"`
 	Lang        string `json:"lang"`
 }
 
 // GuessResponse represents the structure of the JSON response
 type GuessResponse struct {
-	CorrectGuess bool `json:"correctGuess"`
+	CorrectGuess bool    `json:"correctGuess"`
+	Hint         *string `json:"hint,omitempty"`
 }
 
-// GuessResponse represents the structure of the JSON response
+// StartGuessResponse represents the structure of the JSON response
 type StartGuessResponse struct {
 	Images []string `json:"images"`
 }
@@ -204,18 +207,40 @@ func handleGuess(c *gin.Context) {
 		return
 	}
 
+	currentFlag := flags[guessRequest.CurrentStep]
+
 	// Perform the logic to check if the guess is correct
-	isCorrect := checkGuess(flags, guessRequest.CurrentStep, guessRequest.Guess, guessRequest.Lang)
+	isCorrect := checkGuess(currentFlag, guessRequest.Guess, guessRequest.Lang)
 
 	// Prepare the response
-	response := GuessResponse{CorrectGuess: isCorrect}
+	response := GuessResponse{CorrectGuess: isCorrect, Hint: getHint(currentFlag, guessRequest.Lang, guessRequest.Try)}
 	c.JSON(http.StatusOK, response)
 }
 
-func checkGuess(flags []Flag, step int, guess string, lang string) bool {
+func checkGuess(flag Flag, guess string, lang string) bool {
 	// Implement your logic to check if the guess is correct
 	// This is a placeholder implementation, replace it with your actual logic
-	return cleanAndCapitalize(flags[step].Names[lang]) == cleanAndCapitalize(guess)
+	return cleanAndCapitalize(flag.Names[lang]) == cleanAndCapitalize(guess)
+}
+
+func getHint(flag Flag, lang string, try int) *string {
+	var hint *string
+	switch try {
+	case 1:
+		region := flag.Hints["region"]
+		hint = &region
+	case 2:
+		str := []string{flag.Hints["code"], flag.Hints["symbol"]}
+		joined := strings.Join(str, " ")
+		hint = &joined
+	case 3:
+		capital := flag.Hints["capital"]
+		hint = &capital
+	case 4:
+		name := flag.Names[lang][0:1]
+		hint = &name
+	}
+	return hint
 }
 
 func cleanAndCapitalize(input string) string {

@@ -5,7 +5,7 @@ interface FlagState {
     error: string | null;
     step: number;
     maxStep: number;
-    correctGuess: {[key: number]: boolean};
+    correctGuess: {[key: number]: { correctGuess: boolean, hints: string[] }};
     answers: string[];
     isWin: boolean;
     isLoose: boolean;
@@ -20,9 +20,9 @@ const initialState: FlagState = {
     maxStep: 3,
     answers: [],
     correctGuess: {
-        0: false,
-        1: false,
-        2: false
+        0: {correctGuess: false, hints: []},
+        1: {correctGuess: false, hints: []},
+        2: {correctGuess: false, hints: []}
     },
     isWin: false,
     isLoose: false
@@ -45,7 +45,7 @@ const flagReducer = (state = initialState, action: any): FlagState => {
             if (state.step === state.maxStep - 1 && action.correctGuess) {
                 isWin = true
             }
-            return { ...state, loading: false, correctGuess: { ...state.correctGuess, [state.step]: action.correctGuess}, answers, isWin };
+            return { ...state, loading: false, correctGuess: { ...state.correctGuess, [state.step]: {correctGuess: action.correctGuess, hints: [...state.correctGuess[state.step].hints, action.hint]}}, answers, isWin };
         }
         case 'START_GUESS_SUCCESS':
             return { ...state, loading: false, randomFlags: action.payload.images };

@@ -44,7 +44,7 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ maxStep }) => {
 
     const startGame = () => {
         if (!currentDay[today]) {
-            setCurrentDay({[today]: { guessed: [], guesses: [], additionalInfo: {}}})
+            setCurrentDay({[today]: { guessed: [], guesses: [], hints: [], additionalInfo: {}}})
         }
         navigate("/game")
     }
@@ -61,7 +61,7 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ maxStep }) => {
 
     return (
         <div className={'w-full text-center text-black dark:text-white pt-6'}>
-            <div className={'font-extrabold text-4xl'}>
+            <div className={'font-extrabold dark:text-white text-4xl'}>
                 {t('home.title')}
             </div>
             <div className={'mt-36 flex justify-center text-2xl text-black'}>

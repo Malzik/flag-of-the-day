@@ -33,9 +33,10 @@ const fetchFlagsFailure = (error: string) => ({
 const guessRequest = () => ({
     type: GUESS_REQUEST,
 });
-const guessSuccess = (data: {correctGuess: boolean}, name: string) => ({
+const guessSuccess = (data: {correctGuess: boolean, hint: string}, name: string) => ({
     type: GUESS_SUCCESS,
     correctGuess: data.correctGuess,
+    hint: data.hint,
     answer: name
 });
 
@@ -91,7 +92,7 @@ export const getFlagOfTheDay = () => {
     };
 };
 
-export const guess = (step: number, name: string, lang: string) => {
+export const guess = (step: number, tries: number, name: string, lang: string) => {
     return async (dispatch: Dispatch) => {
         dispatch(guessRequest());
 
@@ -102,7 +103,7 @@ export const guess = (step: number, name: string, lang: string) => {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({step, name, lang})
+                body: JSON.stringify({step, name, lang, try: tries})
             });
             const data = await response.json();
             dispatch(guessSuccess(data, name));

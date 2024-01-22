@@ -15,6 +15,36 @@
   "win": {
     "title": "VICTOIRE"
   },
+  "hints": {
+    "region": "Zone géographique",
+    "currency": "Monnaie",
+    "capital": "Capitale",
+    "firstLetter": "Première lettre",
+    "regions": {
+      "Southern Asia": "Asie du Sud",
+      "Southern Europe": "Europe du Sud",
+      "Northern Africa": "Afrique du Nord",
+      "Polynesia": "Polynésie",
+      "Middle Africa": "Afrique centrale",
+      "Caribbean": "Caraïbes",
+      "South America": "Amérique du Sud",
+      "Western Asia": "Asie de l'Ouest",
+      "Australia and New Zealand": "Australie et Nouvelle-Zélande",
+      "Western Europe": "Europe de l'Ouest",
+      "Eastern Europe": "Europe de l'Est",
+      "Central America": "Amérique centrale",
+      "Western Africa": "Afrique de l'Ouest",
+      "Northern America": "Amérique du Nord",
+      "Southern Africa": "Afrique du Sud",
+      "South-Eastern Asi": "Asie du Sud-Est",
+      "Eastern Africa": "Afrique de l'Est",
+      "Eastern Asia": "Asie de l'Est",
+      "Northern Europe": "Europe du Nord",
+      "Melanesia": "Mélanésie",
+      "Micronesia": "Micronésie",
+      "Central Asia": "Asie centrale"
+    }
+  },
   "loading": "Chargement",
   "backToMenu": "Retour au menu",
   "error": "Une erreur est survenue: {error}"

@@ -65,6 +65,10 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({ options, onSelect
         if (event.key === 'Enter' && filteredOptions.length > 0 && inputValue.length > 0) {
             handleOptionClick(filteredOptions[0])
         }
+
+        if (event.key === 'Escape') {
+            setShowOptions(false)
+        }
     }
 
     const handleOptionClick = (selectedOption: string) => {
@@ -76,19 +80,20 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({ options, onSelect
     };
 
     // @ts-ignore
-    return (<div className="autocomplete-container" ref={listRef}>
-            <input
-                type="text"
-                className={'text-black bg-white dark:text-white dark:bg-slate-800 focus:outline-none'}
-                value={inputValue}
-                onFocus={() => {
-                    if (inputValue.length > 0) setShowOptions(true)
-                }}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                placeholder={t('game.search')}
-                autoFocus
-            />
+    return (<div ref={listRef} className={'mt-2 w-full px-5'}>
+            <div className="relative h-10">
+                <input
+                    type="text"
+                    value={inputValue}
+                    onFocus={() => {
+                        if (inputValue.length > 0) setShowOptions(true)
+                    }}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    autoFocus
+                    className="w-full h-full bg-transparent dark:bg-slate-800 text-blue-gray-700 focus:outline-none text-sm px-3 py-2 rounded-xl"
+                    placeholder={t('game.search')} />
+            </div>
 
             {showOptions && (
                 <ul className="autocomplete-options bg-slate-700 shadow max-h-52 overflow-auto absolute inset-x-1 md:inset-x-96">
