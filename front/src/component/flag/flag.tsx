@@ -3,8 +3,7 @@ import React, {useEffect, useState} from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import {RootState} from "../../store/store";
 import {fetchFlags, getFlagOfTheDay, guess, updateStep} from "../../store/action/flag";
-import GuessesComponent from "./guesses/guesses";
-import AutocompleteInput from '../autocomplete/AutocompleteInput';
+import AutocompleteInput from './autocomplete/AutocompleteInput';
 import {useLocalStorage} from "../../utils/useLocalStorage";
 import {useNavigate} from "react-router-dom";
 import useTranslations from "../../i18n/useTranslation";
@@ -148,18 +147,17 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, cor
                     </div>: <div key={index}></div>
                 )}
             </div>
-            {(
-                <div key={randomFlags[step]} className={'flex flex-col items-center'}>
+            <div key={randomFlags[step]} className={'flex flex-col items-center'}>
+                <div className={'md:w-2/6'}>
                     <img
-                        className={'px-4 md:w-96'}
+                        className={'px-4'}
                         src={randomFlags[step]}
                         height="120"
                         alt={t('game.flagAlt')} />
                     <AutocompleteInput options={options} onSelect={(option) => updateFlagName(option)} />
+                    <HintsComponent hints={hints}></HintsComponent>
                 </div>
-            )}
-            {/*<GuessesComponent guesses={guesses}></GuessesComponent>*/}
-            <HintsComponent hints={hints}></HintsComponent>
+            </div>
         </div>
     );
 };

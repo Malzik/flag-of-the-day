@@ -1,8 +1,8 @@
 // AutocompleteInput.tsx
 
 import React, {useEffect, useRef, useState} from 'react';
-import normalizeString from "../../utils/normalize";
-import useTranslations from "../../i18n/useTranslation";
+import normalizeString from "../../../utils/normalize";
+import useTranslations from "../../../i18n/useTranslation";
 
 interface AutocompleteInputProps {
     options: string[];
@@ -80,8 +80,8 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({ options, onSelect
     };
 
     // @ts-ignore
-    return (<div ref={listRef} className={'mt-2 w-full px-5'}>
-            <div className="relative h-10">
+    return (<div ref={listRef} className={'mt-2 w-full md:py-2'}>
+            <div className="relative h-10 px-5">
                 <input
                     type="text"
                     value={inputValue}
@@ -96,9 +96,9 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({ options, onSelect
             </div>
 
             {showOptions && (
-                <ul className="autocomplete-options bg-slate-700 shadow max-h-52 overflow-auto absolute inset-x-1 md:inset-x-96">
+                <ul className="autocomplete-options bg-slate-700 shadow max-h-52 overflow-auto absolute mx-4 md:w-1/3 w-11/12 rounded-md shadow-md shadow-slate-900">
                     {filteredOptions.map((option, index) => (
-                        <li key={option + index} onClick={() => handleOptionClick(option)}>
+                        <li key={option + index} onClick={() => handleOptionClick(option)} className={'mt-0.5'}>
                             {option}
                         </li>
                     ))}
