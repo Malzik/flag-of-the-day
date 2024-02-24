@@ -52,8 +52,8 @@ const WinComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers }) => {
                 </div>
                 <div className={'flex justify-center'}>
                     {randomFlags.map((flag: any, index) => (
-                        <div key={index}>
-                            <div className={'h-24 w-28'}>
+                        <div key={index} className={'w-28 md:mx-2'}>
+                            <div className={'h-24'}>
                                 <img src={flag}  alt="Flag guessed" className={'p-1 rounded shadow-xl'}/>
                             </div>
                             <div>{getFlagName(index)}</div>

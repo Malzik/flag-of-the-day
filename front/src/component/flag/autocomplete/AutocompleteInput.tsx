@@ -96,7 +96,7 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({ options, onSelect
             </div>
 
             {showOptions && (
-                <ul className="autocomplete-options bg-slate-700 shadow max-h-52 overflow-auto absolute mx-4 md:w-1/3 w-11/12 rounded-md shadow-md shadow-slate-900">
+                <ul className="autocomplete-options bg-slate-200 dark:bg-slate-700 shadow max-h-52 overflow-auto absolute mx-4 md:w-1/3 w-11/12 rounded-md shadow-md dark:shadow-slate-900">
                     {filteredOptions.map((option, index) => (
                         <li key={option + index} onClick={() => handleOptionClick(option)} className={'mt-0.5'}>
                             {option}

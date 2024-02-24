@@ -4,6 +4,7 @@
     "startGame": "Start the game"
   },
   "game": {
+    "try": "Try n° {guesses} / {maxGuesses}",
     "flagAlt": "Flag to guess, if you see this, an error occured",
     "guessedFlagAlt": "Guessed flag, if you see this, an error occured",
     "search": "Search..."
@@ -14,6 +15,36 @@
   },
   "win": {
     "title": "VICTORY"
+  },
+  "hints": {
+    "region": "Region",
+    "currency": "Currency",
+    "capital": "Capital",
+    "firstLetter": "First letter",
+    "regions": {
+      "Southern Asia": "Southern Asia",
+      "Southern Europe": "Southern Europe",
+      "Northern Africa": "Northern Africa",
+      "Polynesia": "Polynesia",
+      "Middle Africa": "Middle Africa",
+      "Caribbean": "Caribbean",
+      "South America": "South America",
+      "Western Asia": "Western Asia",
+      "Australia and New Zealand": "Australia and New Zealand",
+      "Western Europe": "Western Europe",
+      "Eastern Europe": "Eastern Europe",
+      "Central America": "Central America",
+      "Western Africa": "Western Africa",
+      "Northern America": "Northern America",
+      "Southern Africa": "Southern Africa",
+      "South-Eastern Asia": "South-Eastern Asi",
+      "Eastern Africa": "Eastern Africa",
+      "Eastern Asia": "Eastern Asia",
+      "Northern Europe": "Northern Europe",
+      "Melanesia": "Melanesia",
+      "Micronesia": "Micronesia",
+      "Central Asia": "Central Asia"
+    }
   },
   "loading": "Loading...",
   "backToMenu": "Back to menu",

@@ -21,22 +21,22 @@ const Header: React.FC = () => {
     };
 
     return (
-        <header className="text-white p-2 flex justify-between items-center">
-            <div className={'grow flex items-center justify-center'}>
-                <NavLink to="/">
-                    <img src="planete.png" alt="Planete" className="h-10 w-10" onClick={()=> navigate("/game")} />
-                </NavLink>
-            </div>
-            <div
-                className="cursor-pointer absolute inset-y-1 right-2 max-h-12"
-                onClick={toggleDarkMode}
-            >
-                {darkSide ? (
-                    <button role="img" aria-label="Sun" className="text-yellow-500 text-3xl h-10 w-10">☀️</button>
-                ) : (
-                    <button role="img" aria-label="Moon" className="text-gray-500 text-3xl h-10 w-10">🌙</button>
-                )}
-            </div>
+        <header className="text-white flex justify-between items-center">
+            {/*<div className={'grow flex items-center justify-center'}>*/}
+            {/*    <NavLink to="/">*/}
+            {/*        <img src="planete.png" alt="Planete" className="h-10 w-10" onClick={()=> navigate("/game")} />*/}
+            {/*    </NavLink>*/}
+            {/*</div>*/}
+            {/*<div*/}
+            {/*    className="cursor-pointer absolute inset-y-1 right-2 max-h-12"*/}
+            {/*    onClick={toggleDarkMode}*/}
+            {/*>*/}
+            {/*    {darkSide ? (*/}
+            {/*        <button role="img" aria-label="Sun" className="text-yellow-500 text-3xl h-10 w-10">☀️</button>*/}
+            {/*    ) : (*/}
+            {/*        <button role="img" aria-label="Moon" className="text-gray-500 text-3xl h-10 w-10">🌙</button>*/}
+            {/*    )}*/}
+            {/*</div>div*/}
         </header>
     );
 };

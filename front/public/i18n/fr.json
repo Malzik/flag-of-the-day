@@ -4,6 +4,7 @@
     "startGame": "Drapeaux du jour"
   },
   "game": {
+    "try": "Tentative n° {guesses} / {maxGuesses}",
     "flagAlt": "Drapeau à deviner, si vous voyez ce message une erreur est survenue",
     "guessedFlagAlt": "Drapeau deviné, si vous voyez ce message une erreur",
     "search": "Rechercher..."
@@ -36,7 +37,7 @@
       "Western Africa": "Afrique de l'Ouest",
       "Northern America": "Amérique du Nord",
       "Southern Africa": "Afrique du Sud",
-      "South-Eastern Asi": "Asie du Sud-Est",
+      "South-Eastern Asia": "Asie du Sud-Est",
       "Eastern Africa": "Afrique de l'Est",
       "Eastern Asia": "Asie de l'Est",
       "Northern Europe": "Europe du Nord",

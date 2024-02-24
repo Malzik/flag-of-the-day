@@ -5,7 +5,7 @@ import {RootState} from "../../store/store";
 import {fetchFlags, getFlagOfTheDay, guess, updateStep} from "../../store/action/flag";
 import AutocompleteInput from './autocomplete/AutocompleteInput';
 import {useLocalStorage} from "../../utils/useLocalStorage";
-import {useNavigate} from "react-router-dom";
+import {NavLink, useNavigate} from "react-router-dom";
 import useTranslations from "../../i18n/useTranslation";
 import HintsComponent from "./hints/hints";
 
@@ -80,7 +80,7 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, cor
                     setHints([])
                 }
             }
-            if(!correctGuess[step].correctGuess && guesses.length === maxGuesses) {
+            if(correctGuess[step] && !correctGuess[step].correctGuess && guesses.length === maxGuesses) {
                 setCurrentDay({...currentDay, [today]: {...currentDay[today], additionalInfo: {loose: true}}})
             }
         }
@@ -139,7 +139,12 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, cor
 
     return (
         <div className={'w-full text-center text-black dark:text-white pt-2'}>
-            <div className={'py-3 text-2xl'}>Tentative n° {guesses.length + 1} / {maxGuesses}</div>
+            <div className={'flex justify-center items-center md:w-2/6 mx-auto py-3'}>
+                <NavLink to="/" className={'p-1 mr-16 shadow-lg dark:bg-slate-700 rounded'}>
+                    <svg className="h-8 w-8" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"/>  <polyline points="5 12 3 12 12 3 21 12 19 12" />  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" /></svg>
+                </NavLink>
+                <div className={'text-2xl'}>{t('game.try', {guesses: guesses.length + 1, maxGuesses})}</div>
+            </div>
             <div className={'flex justify-center items-center'}>
                 {getGuessedFlags().map((flag: any, index) =>
                     flag.length > 0 ? <div key={index} className={'mx-2 mb-2 w-16'}>

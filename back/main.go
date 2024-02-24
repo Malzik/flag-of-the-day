@@ -173,6 +173,9 @@ func CheckIfFlagsExistForToday(filename string) ([]Flag, error) {
 		}
 	}
 
+	if len(flags) == 0 {
+		return CheckIfFlagsExistForToday("drawn_flags.csv")
+	}
 	return flags, nil
 }
 
