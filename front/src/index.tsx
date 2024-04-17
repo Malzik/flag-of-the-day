@@ -12,6 +12,7 @@ import HomeComponent, {loader} from "./component/home/home";
 import WinComponent from "./component/win/win";
 import LooseComponent from "./component/loose/loose";
 import useTranslations from "./i18n/useTranslation";
+import ErrorComponent from "./component/error/error";
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -32,13 +33,15 @@ const router = createBrowserRouter([
             },
             {
                 path: "/win",
-                element: <WinComponent/>,
-                loader: loader
+                element: <WinComponent/>
             },
             {
                 path: "/loose",
-                element: <LooseComponent/>,
-                loader: loader
+                element: <LooseComponent/>
+            },
+            {
+                path: "/error",
+                element: <ErrorComponent/>
             }
         ]
     }

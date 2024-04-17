@@ -4,16 +4,16 @@ import { connect, ConnectedProps } from 'react-redux';
 import store, {RootState} from "../../store/store";
 import {useNavigate} from "react-router-dom";
 import {useLocalStorage} from "../../utils/useLocalStorage";
-import {fetchFlags, getFlagOfTheDay} from "../../store/action/flag";
+import {fetchFlags, getFlagOfTheDay, getProfile} from "../../store/action/flag";
 import FlameCounter from "../../utils/FlameCounter";
 import useTranslations from "../../i18n/useTranslation";
 import useDarkSide from "../../utils/useDarkSide";
 const mapStateToProps = (state: RootState) => ({
-    maxStep: state.flag.maxStep,
+    id: state.flag.profile?.id,
+    streak: state.flag.profile?.streak
 });
 
-const mapDispatchToProps = {
-};
+const mapDispatchToProps = { getProfile };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
@@ -23,13 +23,18 @@ export async function loader() {
     return setTimeout(() => {
         // @ts-ignore
         store.dispatch(fetchFlags())
+        const profile: any = localStorage.getItem('profile')
+        let id = null
+        if (profile) {
+            id = JSON.parse(profile).id
+        }
         // @ts-ignore
-        store.dispatch(getFlagOfTheDay())
+        store.dispatch(getFlagOfTheDay(id))
     }, 50)
 }
 
 const today = new Date().toLocaleDateString("en-US");
-const HomeComponent: React.FC<PropsFromRedux> = ({ maxStep }) => {
+const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, getProfile }) => {
     let navigate = useNavigate();
     const [colorTheme, setTheme] = useDarkSide();
     const [darkSide, setDarkSide] = useState(colorTheme === 'light');
@@ -39,11 +44,16 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ maxStep }) => {
     const {t, init, status} = useTranslations()
 
     useEffect(() => {
-        if (!profile.streak) {
-            setProfile({...profile, streak: profile.streak || 0, lang: profile.lang || currentLang})
+        if (!profile.id && id) {
+            setProfile({...profile, lang: profile.lang || currentLang, id})
         }
+        getProfile(profile.id || null)
         setCurrentLang(profile.lang || currentLang)
     }, []);
+
+    useEffect(() => {
+        setProfile({...profile, lang: profile.lang || currentLang, id})
+    }, [id]);
 
     const toggleDarkMode = () => {
         setTheme(colorTheme);
@@ -51,7 +61,7 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ maxStep }) => {
     };
     const startGame = () => {
         if (!currentDay[today]) {
-            setCurrentDay({[today]: { guessed: [], guesses: [], hints: [], additionalInfo: {}}})
+            setCurrentDay({[today]: { guessed: [], guesses: []}})
         }
         navigate("/game")
     }
@@ -77,7 +87,7 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ maxStep }) => {
                         {t('home.startGame')}
                     </button>
                     <div className={'p-2 rounded-r-lg border-2 border-l-1 border-black dark:border-slate-300'}>
-                        <FlameCounter count={profile.streak ?? 0}></FlameCounter>
+                        <FlameCounter count={streak ?? 0}></FlameCounter>
                     </div>
                 </div>
             </div>
@@ -85,10 +95,10 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ maxStep }) => {
                 <div className={'flex mt-24 justify-around items-center'}>
                         <div className={'flex items-center shadow-md p-2 rounded-md'}>
                             <img src="https://flagcdn.com/fr.svg" alt="French flag"
-                                 className={`px-2 rounded ${currentLang == 'fr' ? "h-6" : "h-4 grayscale"}`}
+                                 className={`px-2 rounded ${currentLang === 'fr' ? "h-6" : "h-4 grayscale"}`}
                                  onClick={() => updateLang('fr')}/>
                             <img src="https://flagcdn.com/gb.svg" alt="UK flag"
-                                 className={`px-2 rounded ${currentLang == 'en' ? "h-6" : "h-4 grayscale"}`}
+                                 className={`px-2 rounded ${currentLang === 'en' ? "h-6" : "h-4 grayscale"}`}
                                  onClick={() => updateLang('en')}/>
                         </div>
                         <div

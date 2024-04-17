@@ -48,5 +48,6 @@
   },
   "loading": "Loading...",
   "backToMenu": "Back to menu",
-  "error": "An error occured: {error}"
+  "error": "An error occured: {error}",
+  "blankError": "An error occurred"
 }

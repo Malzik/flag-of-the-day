@@ -48,5 +48,6 @@
   },
   "loading": "Chargement",
   "backToMenu": "Retour au menu",
-  "error": "Une erreur est survenue: {error}"
+  "error": "Une erreur est survenue: {error}",
+  "blankError": "Une erreur est survenue"
 }

@@ -7,7 +7,9 @@ import {useLocalStorage} from "../../utils/useLocalStorage";
 import useTranslations from "../../i18n/useTranslation";
 const mapStateToProps = (state: RootState) => ({
     randomFlags: state.flag.randomFlags,
-    answers: state.flag.answers
+    answers: state.flag.answers,
+    isLoose: state.flag.isLoose,
+    loading: state.flag.loading,
 });
 
 const mapDispatchToProps = {
@@ -17,19 +19,17 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 const today = new Date().toLocaleDateString("en-US");
-const LooseComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers }) => {
+const LooseComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers,isLoose, loading }) => {
     const navigate = useNavigate()
-    const [currentDay, setCurrentDay] = useLocalStorage('currentDay', '')
-    const [profile, setProfile] = useLocalStorage('profile', '')
+    const [currentDay] = useLocalStorage('currentDay', '')
     const {t, status} = useTranslations()
 
     useEffect(() => {
-        if (!currentDay[today] || !currentDay[today].additionalInfo || !currentDay[today].additionalInfo.loose) {
+        if (!loading && !isLoose) {
             navigate('/')
             return
         }
-        setProfile({...profile, streak: 0})
-    }, []);
+    }, [loading, isLoose]);
 
     const getFlagName = (step: number) => {
         if (currentDay[today] && currentDay[today].guessed && currentDay[today].guessed[step]) {
@@ -38,7 +38,7 @@ const LooseComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers }) => {
         return '?'
     }
 
-    if (status === 'loading' || !currentDay[today] || !currentDay[today].additionalInfo || !currentDay[today].additionalInfo.loose) {
+    if (status === 'loading' || loading) {
         return (<div>{t('loading')}</div>)
     }
 

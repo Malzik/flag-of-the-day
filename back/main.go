@@ -1,79 +1,70 @@
 package main
 
 import (
-	"encoding/csv"
-	"encoding/json"
+	"back/config"
+	"back/game"
+	"back/model"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/text/unicode/norm"
-	"io/ioutil"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
-	"strings"
 	"time"
-	"unicode"
 )
-
-// Flag represents the structure of a flag
-type Flag struct {
-	Code  string            `json:"code"`
-	Image string            `json:"image"`
-	Names map[string]string `json:"name"`
-	Hints map[string]string `json:"hints"`
-}
 
 // GuessRequest represents the structure of the incoming JSON payload for the guess endpoint
 type GuessRequest struct {
-	CurrentStep int    `json:"step"`
-	Try         int    `json:"try"`
-	Guess       string `json:"name"`
-	Lang        string `json:"lang"`
+	PlayerId string `json:"id"`
+	Date     string `json:"date"`
+	Guess    string `json:"name"`
+	Lang     string `json:"lang"`
 }
 
-// GuessResponse represents the structure of the JSON response
+type ProfileResponse struct {
+	Id     string `json:"id"`
+	Streak int    `json:"streak"`
+}
+
 type GuessResponse struct {
-	CorrectGuess bool    `json:"correctGuess"`
-	Hint         *string `json:"hint,omitempty"`
+	CorrectGuess bool     `json:"correctGuess"`
+	Hint         []string `json:"hint,omitempty"`
+	Tries        int      `json:"tries"`
+	Win          string   `json:"win"`
 }
 
-// StartGuessResponse represents the structure of the JSON response
 type StartGuessResponse struct {
-	Images []string `json:"images"`
+	Images     []string `json:"images"`
+	Hint       []string `json:"hint,omitempty"`
+	IsFinished string   `json:"isFinished,omitempty"`
 }
 
-// Flags slice to store the flags loaded from the JSON file
-var Flags []Flag
+var Flags []model.Flag
+var db gorm.DB
 
-func init() {
-	// Load flags from the JSON file at program startup
-	loadFlags()
-}
-
-func loadFlags() {
-	// Read the contents of the flags.json file
-	fileContent, err := ioutil.ReadFile("flags.json")
-	if err != nil {
-		fmt.Println("Error reading flags.json:", err)
-		return
+func handleProfile(c *gin.Context) {
+	var player model.Player
+	playerId := c.Query("id")
+	if len(playerId) != 0 {
+		db.Where("id = ?", playerId).First(&player)
 	}
-
-	// Unmarshal the JSON content into the Flags slice
-	err = json.Unmarshal(fileContent, &Flags)
-	if err != nil {
-		fmt.Println("Error unmarshaling flags.json:", err)
-		return
+	if player == (model.Player{}) {
+		playerId = uuid.New().String()
+		db.Create(model.Player{Id: playerId, Streak: 0})
 	}
+	response := ProfileResponse{Id: playerId, Streak: player.Streak}
+	c.JSON(http.StatusOK, response)
 }
 
 // DrawThreeRandomFlags selects three random flags from the loaded flags
-func DrawThreeRandomFlags() []Flag {
+func DrawThreeRandomFlags() []model.Flag {
 	// Seed the random number generator
 	rand.Seed(time.Now().UnixNano())
 
 	// Make a copy of the Flags slice to avoid modifying the original slice
-	copiedFlags := make([]Flag, len(Flags))
+	copiedFlags := make([]model.Flag, len(Flags))
 	copy(copiedFlags, Flags)
 
 	// Shuffle the copiedFlags slice using the Fisher-Yates algorithm
@@ -86,182 +77,112 @@ func DrawThreeRandomFlags() []Flag {
 	return copiedFlags[:3]
 }
 
-func AppendCSV(filename string, flags []Flag) error {
-	file, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
-
-	currentDate := time.Now().Format("2006-01-02")
-	row := []string{currentDate}
-
-	flagsJSON, err := json.Marshal(flags)
-	if err != nil {
-		return err
-	}
-
-	row = append(row, string(flagsJSON))
-
-	err = writer.Write(row)
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("New line for %s as been inserted\n", currentDate)
-	return nil
-}
-
 // CheckIfFlagsExistForToday checks if flags for the current date have already been saved
-func CheckIfFlagsExistForToday(filename string) ([]Flag, error) {
-	file, err := os.Open(filename)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	// Créer un reader CSV à partir du fichier
-	reader := csv.NewReader(file)
-
-	// Lire toutes les lignes du fichier
-	allRows, err := reader.ReadAll()
-	if err != nil {
-		return nil, err
-	}
-
-	var flags []Flag
-	// Iterate over each line
-	for _, line := range allRows {
-		if len(line) == 0 {
-			continue
-		}
-		// Extract the date from the line
-		dateString := strings.TrimSpace(line[0])
-
-		// Parse the date string
-		date, err := time.Parse("2006-01-02", dateString)
-		if err != nil {
-			continue // Skip lines that don't have a valid date
-		}
-
-		// Check if the date is today
-		today := time.Now().Format("2006-01-02") == date.Format("2006-01-02")
-		if today {
-			// Extract the flags from the line
-			flagsJSON := line[1]
-			err := json.Unmarshal([]byte(flagsJSON), &flags)
-			if err != nil {
-				return nil, err
-			}
-
-			return flags, nil
-		}
-	}
-
-	if len(flags) == 0 {
+func CheckIfFlagsExistForToday(currentDate string) ([]model.Flag, error) {
+	var game model.Game
+	if err := db.Preload("Flags").Where("DATE(date) = ?", currentDate).First(&game).Error; err != nil {
 		// Flags for today do not exist, so draw three new flags and save them
 		flags := DrawThreeRandomFlags()
 		fmt.Println("Random Flags:", flags)
 
-		err := AppendCSV("drawn_flags.csv", flags)
-		if err != nil {
-			fmt.Println("Error saving flags to file:", err)
-			return nil, err
+		game = model.Game{Date: time.Now()}
+
+		for index, flag := range flags {
+			drawFlag := model.DrawFlags{
+				Code: flag.Code,
+				Step: index,
+			}
+			game.Flags = append(game.Flags, drawFlag)
 		}
+
+		db.Create(&game)
 	}
 
-	if len(flags) == 0 {
-		return CheckIfFlagsExistForToday("drawn_flags.csv")
-	}
+	var flags []model.Flag
+
+	db.Raw(`
+		SELECT f.* FROM flags f
+		JOIN draw_flags df ON f.code = df.code
+		WHERE df.game_id = ?
+	`, game.Id).Scan(&flags)
+
 	return flags, nil
 }
 
+func handleDate(currentDate string) string {
+	if len(currentDate) != 0 {
+		date, err := time.Parse("2006-01-02", currentDate)
+		if err == nil {
+			return date.Format("2006-01-02")
+		}
+	}
+	return time.Now().Format("2006-01-02")
+}
+
 func handleStartGuess(c *gin.Context) {
+	playerId := c.Query("id")
+	lang := c.Query("lang")
+	player, playerError := game.CheckPlayer(db, playerId)
+	if playerError != nil {
+		c.JSON(playerError.Status, gin.H{"error": playerError.Message})
+		return
+	}
+	currentDate := handleDate(c.Query("date"))
 	// Check if flags for today already exist
-	flags, err := CheckIfFlagsExistForToday("drawn_flags.csv")
+	flags, err := CheckIfFlagsExistForToday(currentDate)
 	if err != nil {
 		fmt.Println("Error checking if flags exist for today:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
 		return
 	}
+
 	var images []string
 	for _, flag := range flags {
 		images = append(images, flag.Image)
 	}
-	response := StartGuessResponse{Images: images}
+	isFinished := game.CheckIfGameFinished(db, *player, currentDate)
+	response := StartGuessResponse{Images: images, Hint: game.HandleStartGuess(db, flags, *player, game.GetLang(lang), currentDate), IsFinished: isFinished}
 	c.JSON(http.StatusOK, response)
 }
 
 func handleGuess(c *gin.Context) {
-	// Check if flags for today already exist
-	flags, err := CheckIfFlagsExistForToday("drawn_flags.csv")
-	if err != nil {
-		fmt.Println("Error checking if flags exist for today:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
-		return
-	}
 	// Parse the JSON request body
 	var guessRequest GuessRequest
 	if err := c.ShouldBindJSON(&guessRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON payload"})
 		return
 	}
-
-	currentFlag := flags[guessRequest.CurrentStep]
-
-	// Perform the logic to check if the guess is correct
-	isCorrect := checkGuess(currentFlag, guessRequest.Guess, guessRequest.Lang)
-
+	player, playerError := game.CheckPlayer(db, guessRequest.PlayerId)
+	if playerError != nil {
+		c.JSON(playerError.Status, gin.H{"error": playerError.Message})
+		return
+	}
+	if len(guessRequest.Date) == 0 {
+		guessRequest.Date = time.Now().Format("2006-01-02")
+	}
+	// Check if flags for today already exist
+	flags, err := CheckIfFlagsExistForToday(guessRequest.Date)
+	if err != nil {
+		fmt.Println("Error checking if flags exist for today:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
 	// Prepare the response
-	response := GuessResponse{CorrectGuess: isCorrect, Hint: getHint(currentFlag, guessRequest.Lang, guessRequest.Try)}
+	isCorrect, hint, tries := game.HandleGuess(db, flags, guessRequest.Guess, game.GetLang(guessRequest.Lang), guessRequest.Date, *player)
+	response := GuessResponse{CorrectGuess: isCorrect, Hint: hint, Tries: tries}
 	c.JSON(http.StatusOK, response)
 }
 
-func checkGuess(flag Flag, guess string, lang string) bool {
-	// Implement your logic to check if the guess is correct
-	// This is a placeholder implementation, replace it with your actual logic
-	return cleanAndCapitalize(flag.Names[lang]) == cleanAndCapitalize(guess)
-}
-
-func getHint(flag Flag, lang string, try int) *string {
-	var hint *string
-	switch try {
-	case 1:
-		region := flag.Hints["region"]
-		hint = &region
-	case 2:
-		str := []string{flag.Hints["code"], flag.Hints["symbol"]}
-		joined := strings.Join(str, " ")
-		hint = &joined
-	case 3:
-		capital := flag.Hints["capital"]
-		hint = &capital
-	case 4:
-		name := flag.Names[lang][0:1]
-		hint = &name
-	}
-	return hint
-}
-
-func cleanAndCapitalize(input string) string {
-	normalized := norm.NFD.String(input)
-
-	// Remove non-letter characters and capitalize the string
-	var cleanedGuess strings.Builder
-	for _, char := range normalized {
-		if unicode.IsLetter(char) {
-			cleanedGuess.WriteRune(char)
-		}
-	}
-
-	// Capitalize the guess
-	return strings.ToLower(cleanedGuess.String())
-}
-
 func main() {
+	db = config.Db()
+	db.Preload("Names").Preload("Hints").Find(&Flags)
+
+	//Perform database migration
+	err := db.AutoMigrate(&model.Flag{}, &model.FlagName{}, &model.FlagHints{}, &model.Game{}, &model.DrawFlags{}, &model.Player{}, &model.PlayerGame{}, &model.PlayerGuesses{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	csvFile, err := os.OpenFile("access.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatalf("failed creating file: %s", err)
@@ -285,10 +206,9 @@ func main() {
 		c.Status(204)
 	})
 
-	// Define the /guess endpoint
+	r.GET("/api/profile", handleProfile)
 	r.GET("/api/startGuess", handleStartGuess)
 
-	// Define the /guess endpoint
 	r.POST("/api/guess", handleGuess)
 
 	// Start the HTTP server on port 8080

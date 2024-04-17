@@ -2,13 +2,15 @@ interface FlagState {
     flags: any;
     randomFlags: string[]
     loading: boolean;
-    error: string | null;
+    error: any;
     step: number;
     maxStep: number;
     correctGuess: {[key: number]: { correctGuess: boolean, hints: string[] }};
     answers: string[];
     isWin: boolean;
     isLoose: boolean;
+    profile: { id: string, streak: number } | null;
+    tries: number;
 }
 
 const initialState: FlagState = {
@@ -25,7 +27,9 @@ const initialState: FlagState = {
         2: {correctGuess: false, hints: []}
     },
     isWin: false,
-    isLoose: false
+    isLoose: false,
+    profile: null,
+    tries: 0
 };
 
 const flagReducer = (state = initialState, action: any): FlagState => {
@@ -33,7 +37,10 @@ const flagReducer = (state = initialState, action: any): FlagState => {
         case 'FETCH_FLAGS_REQUEST':
         case 'GUESS_REQUEST':
         case 'START_GUESS_REQUEST':
+        case 'PROFILE_REQUEST':
             return { ...state, loading: true, error: null };
+        case "RESET_ERROR":
+            return { ...state, error: null };
         case 'FETCH_FLAGS_SUCCESS':
             return { ...state, loading: false, flags: action.payload };
         case 'GUESS_SUCCESS': {
@@ -45,13 +52,25 @@ const flagReducer = (state = initialState, action: any): FlagState => {
             if (state.step === state.maxStep - 1 && action.correctGuess) {
                 isWin = true
             }
-            return { ...state, loading: false, correctGuess: { ...state.correctGuess, [state.step]: {correctGuess: action.correctGuess, hints: [...state.correctGuess[state.step].hints, action.hint]}}, answers, isWin };
+            return { ...state, loading: false, correctGuess: { ...state.correctGuess, [state.step]: {correctGuess: action.correctGuess, hints: action.hint}}, answers, isWin, tries: action.tries };
         }
         case 'START_GUESS_SUCCESS':
-            return { ...state, loading: false, randomFlags: action.payload.images };
+            return { ...state,
+                loading: false,
+                randomFlags: action.payload.images,
+                isWin: action.payload.isFinished === 'WIN',
+                isLoose: action.payload.isFinished === 'LOOSE',
+                correctGuess: {
+                    ...state.correctGuess,
+                    [state.step]: {correctGuess: false, hints: action.payload.hint ?? []}
+                }
+            }
+        case 'PROFILE_REQUEST_SUCCESS':
+            return { ...state, loading: false, profile: action.payload };
         case 'FETCH_FLAGS_FAILURE':
         case 'GUESS_FAILURE':
         case 'START_GUESS_FAILURE':
+        case 'PROFILE_REQUEST_FAILURE':
             return { ...state, loading: false, error: action.payload };
         case 'UPDATE_STEP':
             return { ...state, step: action.step };

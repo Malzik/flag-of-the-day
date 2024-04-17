@@ -17,7 +17,9 @@ const mapStateToProps = (state: RootState) => ({
     randomFlags: state.flag.randomFlags,
     step: state.flag.step,
     correctGuess: state.flag.correctGuess,
-    isWin: state.flag.isWin
+    isWin: state.flag.isWin,
+    isLoose: state.flag.isLoose,
+    tries: state.flag.tries
 });
 
 const mapDispatchToProps = {
@@ -33,7 +35,7 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 const today = new Date().toLocaleDateString("en-US");
 
 // @ts-ignore
-const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, correctGuess, isWin, loading, error, getFlagOfTheDay, fetchFlags, guess, updateStep }) => {
+const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, correctGuess, isWin, isLoose, loading, error, tries, getFlagOfTheDay, fetchFlags, guess, updateStep }) => {
     const [flagName, setFlagName] = useState("")
     const [guesses, setGuesses] = useState<string[]>([])
     const [hints, setHints] = useState<string[]>([])
@@ -55,15 +57,16 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, cor
                 return
             }
             setGuesses(currentDay[today].guesses)
-            setHints(currentDay[today].hints)
             updateStep(currentDay[today].guessed.length)
         })
     });
 
     useEffect(() => {
         if (!loading) {
+            if (correctGuess[step].hints && hints.length != correctGuess[step].hints.length) {
+                setHints(correctGuess[step].hints)
+            }
             if (flagName.length > 0) {
-                setCurrentDay({...currentDay, [today]: {...currentDay[today], hints: correctGuess[step].hints}})
                 setHints(correctGuess[step].hints)
                 if (correctGuess[step].correctGuess) {
                     setCurrentDay({
@@ -71,7 +74,6 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, cor
                         [today]: {
                             ...currentDay[today],
                             guesses: [],
-                            hints: [],
                             guessed: [...currentDay[today].guessed, {step, flagName}]
                         }
                     })
@@ -80,33 +82,29 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, cor
                     setHints([])
                 }
             }
-            if(correctGuess[step] && !correctGuess[step].correctGuess && guesses.length === maxGuesses) {
-                setCurrentDay({...currentDay, [today]: {...currentDay[today], additionalInfo: {loose: true}}})
-            }
         }
-    }, [correctGuess, loading]);
+    }, [correctGuess]);
 
     useEffect(() => {
+        console.log(isWin, isLoose, currentDay)
+        if (!profile.lang) {
+            navigate('/')
+        }
         if (!currentDay[today]) {
             return
         }
-        if (isWin && !currentDay[today].additionalInfo.win) {
-            setProfile({...profile, streak: profile.streak+1})
-            setCurrentDay({...currentDay, [today]: {...currentDay[today], additionalInfo: {win: true}, guesses: [], guessed:  [...currentDay[today].guessed, {step, flagName}]}})
-        }
-
-        if (currentDay[today].additionalInfo.win) {
+        if (isWin) {
             navigate('/win')
         }
 
-        if (currentDay[today].additionalInfo.loose) {
+        if (isLoose) {
             navigate('/loose')
         }
-    }, [isWin, currentDay])
+    }, [isWin, isLoose, currentDay])
 
     const updateFlagName = (newFlagName: string) => {
         if (newFlagName.length > 0) {
-            guess(step, [...guesses, newFlagName].length, newFlagName, profile.lang)
+            guess(newFlagName, profile.lang, profile.id)
             setFlagName(newFlagName)
             setGuesses([...guesses, newFlagName])
             setCurrentDay({...currentDay, [today]: {...currentDay[today], guesses: [...guesses, newFlagName]}})
@@ -118,20 +116,23 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, cor
     }
 
     if (error) {
-        return <p>{t('error', {error})}</p>;
+        setTimeout(() => {
+            navigate('/error');
+        }, 20)
+        return null
     }
 
-    if (!flags || randomFlags.length === 0) {
+    if (!flags || !randomFlags) {
         return null;
     }
 
     const getGuessedFlags = () => {
         const result = []
         for (let i = 0; i < 3; i++) {
-            if (step > i) {
-                result.push(randomFlags[i])
-            } else {
+            if (step <= i || !randomFlags[i]) {
                 result.push('')
+            } else {
+                result.push(randomFlags[i])
             }
         }
         return result
@@ -141,9 +142,9 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, cor
         <div className={'w-full text-center text-black dark:text-white pt-2'}>
             <div className={'flex justify-center items-center md:w-2/6 mx-auto py-3'}>
                 <NavLink to="/" className={'p-1 mr-16 shadow-lg dark:bg-slate-700 rounded'}>
-                    <svg className="h-8 w-8" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"/>  <polyline points="5 12 3 12 12 3 21 12 19 12" />  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" /></svg>
+                    <svg className="h-8 w-8" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">  <path stroke="none" d="M0 0h24v24H0z"/>  <polyline points="5 12 3 12 12 3 21 12 19 12" />  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" /></svg>
                 </NavLink>
-                <div className={'text-2xl'}>{t('game.try', {guesses: guesses.length + 1, maxGuesses})}</div>
+                <div className={'text-2xl'}>{t('game.try', {guesses: tries + 1, maxGuesses})}</div>
             </div>
             <div className={'flex justify-center items-center'}>
                 {getGuessedFlags().map((flag: any, index) =>
@@ -158,6 +159,7 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, cor
                         className={'px-4'}
                         src={randomFlags[step]}
                         height="120"
+                        width="350"
                         alt={t('game.flagAlt')} />
                     <AutocompleteInput options={options} onSelect={(option) => updateFlagName(option)} />
                     <HintsComponent hints={hints}></HintsComponent>

@@ -1,9 +1,13 @@
 // src/actions/counter.ts
 import {Dispatch} from "redux";
-import {Flag} from "../model/flag";
+import {Flag, Player} from "../model/flag";
+import {getFormattedDate} from "../../utils/normalize";
 
 const apiUrl = process.env.REACT_APP_API_URL
 // Define action types
+export const PROFILE_REQUEST = 'PROFILE_REQUEST';
+export const PROFILE_REQUEST_SUCCESS = 'PROFILE_REQUEST_SUCCESS';
+export const PROFILE_REQUEST_FAILURE = 'PROFILE_REQUEST_FAILURE';
 export const FETCH_FLAGS_REQUEST = 'FETCH_FLAGS_REQUEST';
 export const FETCH_FLAGS_SUCCESS = 'FETCH_FLAGS_SUCCESS';
 export const FETCH_FLAGS_FAILURE = 'FETCH_FLAGS_FAILURE';
@@ -14,7 +18,22 @@ export const START_GUESS_REQUEST = 'START_GUESS_REQUEST';
 export const START_GUESS_SUCCESS = 'START_GUESS_SUCCESS';
 export const START_GUESS_FAILURE = 'START_GUESS_FAILURE';
 export const UPDATE_STEP = 'UPDATE_STEP';
+export const RESET_ERROR = 'RESET_ERROR';
 
+// Define action creators
+const profileRequest = () => ({
+    type: PROFILE_REQUEST,
+});
+
+const profileRequestSuccess = (data: Player[]) => ({
+    type: PROFILE_REQUEST_SUCCESS,
+    payload: data,
+});
+
+const profileRequestFailure = (error: string) => ({
+    type: PROFILE_REQUEST_FAILURE,
+    payload: error,
+});
 // Define action creators
 const fetchFlagsRequest = () => ({
     type: FETCH_FLAGS_REQUEST,
@@ -33,11 +52,17 @@ const fetchFlagsFailure = (error: string) => ({
 const guessRequest = () => ({
     type: GUESS_REQUEST,
 });
-const guessSuccess = (data: {correctGuess: boolean, hint: string}, name: string) => ({
+
+const resetErrorRequest = () => ({
+    type: RESET_ERROR,
+});
+
+const guessSuccess = (data: {correctGuess: boolean, hint: string, tries: number}, name: string) => ({
     type: GUESS_SUCCESS,
     correctGuess: data.correctGuess,
     hint: data.hint,
-    answer: name
+    answer: name,
+    ties: data.tries
 });
 
 const guessFailure = (error: string) => ({
@@ -53,7 +78,7 @@ const startGuessSuccess = (data: Flag[]) => ({
     payload: data,
 });
 
-const startGuessFailure = (error: string) => ({
+const startGuessFailure = (error: any) => ({
     type: START_GUESS_FAILURE,
     payload: error,
 });
@@ -62,6 +87,31 @@ export const updateStep = (newStep: number) => ({
     type: UPDATE_STEP,
     step: newStep,
 });
+
+export const getProfile = (id: string) => {
+    return async (dispatch: Dispatch) => {
+        dispatch(profileRequest());
+
+        try {
+            let url = apiUrl + '/profile'
+            if (id !== null) {
+                url += '?id=' + id
+            }
+            const response = await fetch(url);
+            const data = await response.json();
+
+            dispatch(profileRequestSuccess(data));
+        } catch (error: any) {
+            dispatch(profileRequestFailure(error));
+        }
+    };
+};
+
+export const resetError = () => {
+    return async (dispatch: Dispatch) => {
+        dispatch(resetErrorRequest());
+    };
+};
 
 // Async action creator using redux-thunk
 export const fetchFlags = () => {
@@ -73,26 +123,29 @@ export const fetchFlags = () => {
             const data = await response.json();
             dispatch(fetchFlagsSuccess(data));
         } catch (error: any) {
-            dispatch(fetchFlagsFailure(error.message));
+            dispatch(fetchFlagsFailure(error));
         }
     };
 };
 
-export const getFlagOfTheDay = () => {
+export const getFlagOfTheDay = (id: string) => {
     return async (dispatch: Dispatch) => {
         dispatch(startGuessRequest());
 
         try {
-            const response = await fetch(apiUrl + '/startGuess');
+            const response = await fetch(apiUrl + '/startGuess?date=' + getFormattedDate() + '&id=' + id);
+            if (response.status >= 300) {
+                dispatch(startGuessFailure(response));
+            }
             const data = await response.json();
             dispatch(startGuessSuccess(data));
         } catch (error: any) {
-            dispatch(startGuessFailure(error.message));
+            dispatch(startGuessFailure(error));
         }
     };
 };
 
-export const guess = (step: number, tries: number, name: string, lang: string) => {
+export const guess = (name: string, lang: string, id: string) => {
     return async (dispatch: Dispatch) => {
         dispatch(guessRequest());
 
@@ -103,12 +156,12 @@ export const guess = (step: number, tries: number, name: string, lang: string) =
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({step, name, lang, try: tries})
+                body: JSON.stringify({name, lang, id, date: getFormattedDate()})
             });
             const data = await response.json();
             dispatch(guessSuccess(data, name));
         } catch (error: any) {
-            dispatch(guessFailure(error.message));
+            dispatch(guessFailure(error));
         }
     };
 };

@@ -8,7 +8,9 @@ import useTranslations from "../../i18n/useTranslation";
 
 const mapStateToProps = (state: RootState) => ({
     randomFlags: state.flag.randomFlags,
-    answers: state.flag.answers
+    answers: state.flag.answers,
+    isWin: state.flag.isWin,
+    loading: state.flag.loading,
 });
 
 const mapDispatchToProps = {
@@ -18,19 +20,19 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 const today = new Date().toLocaleDateString("en-US");
-const WinComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers }) => {
+const WinComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers, isWin, loading }) => {
     const navigate = useNavigate()
     const [currentDay] = useLocalStorage('currentDay', '')
     const {t, status} = useTranslations()
 
     useEffect(() => {
-        if (!currentDay[today] || !currentDay[today].additionalInfo || !currentDay[today].additionalInfo.win) {
+        if (!loading && !isWin) {
             navigate('/')
             return
         }
-    }, []);
+    }, [loading, isWin]);
 
-    if (status === 'loading' || !currentDay[today] || !currentDay[today].additionalInfo || !currentDay[today].additionalInfo.win) {
+    if (status === 'loading' || loading) {
         return (<div>{t('loading')}</div>)
     }
 
@@ -53,8 +55,8 @@ const WinComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers }) => {
                 <div className={'flex justify-center'}>
                     {randomFlags.map((flag: any, index) => (
                         <div key={index} className={'w-28 md:mx-2'}>
-                            <div className={'h-24'}>
-                                <img src={flag}  alt="Flag guessed" className={'p-1 rounded shadow-xl'}/>
+                            <div className={'h-24 flex justify-center'}>
+                                <img src={flag}  alt="Flag guessed" className={'p-1 rounded shadow-xl h-4/5'}/>
                             </div>
                             <div>{getFlagName(index)}</div>
                         </div>

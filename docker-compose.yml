@@ -49,6 +49,20 @@ services:
       - 'traefik.http.services.fotd-api.loadbalancer.server.port=8082'
       - "traefik.docker.network=traefik_webgateway"
 
+  fotd-db:
+    image: mariadb:11.3.2
+    container_name: fotd-db
+    volumes:
+      - "./volumes/db:/var/lib/mysql"
+      - "./database/:/docker-entrypoint-initdb.d/"
+    environment:
+      MYSQL_DATABASE: fotd
+      MYSQL_USER: fotd
+      MYSQL_PASSWORD: fotd
+      MYSQL_ROOT_PASSWORD: fotd
+    ports:
+      - "3306:3306"
+
 networks:
   traefik_webgateway:
     external: true
