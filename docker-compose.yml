@@ -40,6 +40,7 @@ services:
     depends_on: [reverse-proxy]
     networks:
       - traefik_webgateway
+      - database
     ports:
       - "8082:8082"
     labels:
@@ -60,9 +61,12 @@ services:
       MYSQL_USER: fotd
       MYSQL_PASSWORD: fotd
       MYSQL_ROOT_PASSWORD: fotd
+    networks:
+      - database
     ports:
       - "3306:3306"
 
 networks:
   traefik_webgateway:
     external: true
+  database:
