@@ -1,7 +1,7 @@
-# Use an official Go runtime as a parent image
-FROM golang:1.18-alpine
+# Start from the official Go image to build the binary
+FROM golang:1.18-alpine AS builder
 
-# Set the working directory in the container
+# Set the working directory in the builder container
 WORKDIR /usr/src/app
 
 # Copy the local package files to the container's workspace
@@ -10,7 +10,19 @@ COPY . .
 # Build the Go application
 RUN go build -o main main.go
 
-# Expose port 8080 to the outside world
+# Use a minimal alpine image for the final stage
+FROM alpine:latest
+
+# Set the working directory in the final stage container
+WORKDIR /app
+
+# Set the GIN_MODE environment variable to release
+ENV GIN_MODE=release
+
+# Copy the binary from the builder stage
+COPY --from=builder /usr/src/app/main /app/
+
+# Expose port 8082 to the outside world
 EXPOSE 8082
 
 # Command to run the executable
