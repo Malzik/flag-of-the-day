@@ -31,13 +31,6 @@ const LooseComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers,isLoose
         }
     }, [loading, isLoose]);
 
-    const getFlagName = (step: number) => {
-        if (currentDay[today] && currentDay[today].guessed && currentDay[today].guessed[step]) {
-            return currentDay[today].guessed[step].flagName
-        }
-        return '?'
-    }
-
     if (status === 'loading' || loading) {
         return (<div>{t('loading')}</div>)
     }
@@ -56,7 +49,7 @@ const LooseComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers,isLoose
                         <div className={'h-24'}>
                             <img src={flag}  alt="Flag guessed" key={index} className={'p-1 rounded shadow-xl'}/>
                         </div>
-                        <div>{getFlagName(index)}</div>
+                        <div>{answers[index]}</div>
                     </div>
                 ))}
             </div>

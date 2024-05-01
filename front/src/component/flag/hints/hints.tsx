@@ -12,7 +12,7 @@ const HintsComponent: React.FC<HintsComponentProps> = ({ hints }) => {
     }
 
     return (
-        <div className={'flex flex-col mx-5'}>
+        <div className={'w-full px-4'}>
             {hints.map((hint: string, index: number) => (
                 <div key={index} className={'flex items-center py-1 shadow-md rounded-lg dark:bg-slate-800 my-1 dark:shadow-slate-900'}>
                     <img className={'ml-2 h-9'} src={indexToName(index) + '.png'} alt={t(indexToName(index))}/>

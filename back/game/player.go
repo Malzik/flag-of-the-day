@@ -29,9 +29,7 @@ func CheckPlayer(db gorm.DB, playerId string) (*model.Player, *PlayerError) {
 
 func GetLang(lang string) string {
 	if lang != "" {
-		lang = lang
-	} else {
-		lang = "en"
+		return lang
 	}
-	return lang
+	return "en"
 }

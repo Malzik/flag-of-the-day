@@ -10,7 +10,9 @@ import useTranslations from "../../i18n/useTranslation";
 import useDarkSide from "../../utils/useDarkSide";
 const mapStateToProps = (state: RootState) => ({
     id: state.flag.profile?.id,
-    streak: state.flag.profile?.streak
+    streak: state.flag.profile?.streak,
+    loading: state.flag.loading,
+    error: state.flag.error
 });
 
 const mapDispatchToProps = { getProfile };
@@ -23,18 +25,21 @@ export async function loader() {
     return setTimeout(() => {
         // @ts-ignore
         store.dispatch(fetchFlags())
-        const profile: any = localStorage.getItem('profile')
+        let profile: any = localStorage.getItem('profile')
         let id = null
+        let lang = 'en'
         if (profile) {
-            id = JSON.parse(profile).id
+            profile = JSON.parse(profile)
+            id = profile.id
+            lang = profile.lang
         }
         // @ts-ignore
-        store.dispatch(getFlagOfTheDay(id))
+        store.dispatch(getFlagOfTheDay(id, lang))
     }, 50)
 }
 
 const today = new Date().toLocaleDateString("en-US");
-const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, getProfile }) => {
+const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, loading, error, getProfile }) => {
     let navigate = useNavigate();
     const [colorTheme, setTheme] = useDarkSide();
     const [darkSide, setDarkSide] = useState(colorTheme === 'light');
@@ -83,10 +88,11 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, getProfile }) => 
             </div>
             <div className={'mt-36 flex justify-center text-2xl text-black'}>
                 <div className={'flex hover:shadow-inner hover:shadow-2xl dark:bg-slate-100 rounded-lg'}>
-                    <button onClick={()=> startGame()} className={'p-6 rounded-l-lg border-2 border-r-0 border-black dark:border-slate-300 font-semibold'}>
+                    <button onClick={()=> startGame()} disabled={loading || error}
+                            className={'p-6 rounded-l-lg border-2 border-r-0 border-black dark:border-slate-300 font-semibold disabled:cursor-wait'}>
                         {t('home.startGame')}
                     </button>
-                    <div className={'p-2 rounded-r-lg border-2 border-l-1 border-black dark:border-slate-300'}>
+                    <div className={'p-2 rounded-r-lg border-2 border-l-1 border-black dark:border-slate-300 font-semibold'}>
                         <FlameCounter count={streak ?? 0}></FlameCounter>
                     </div>
                 </div>

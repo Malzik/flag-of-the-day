@@ -57,12 +57,14 @@ const resetErrorRequest = () => ({
     type: RESET_ERROR,
 });
 
-const guessSuccess = (data: {correctGuess: boolean, hint: string, tries: number}, name: string) => ({
+const guessSuccess = (data: {correctGuess: boolean, hint: string, tries: number, isFinished: string, answers: string[]}, name: string) => ({
     type: GUESS_SUCCESS,
     correctGuess: data.correctGuess,
     hint: data.hint,
     answer: name,
-    ties: data.tries
+    tries: data.tries,
+    isFinished: data.isFinished,
+    answers: data.answers
 });
 
 const guessFailure = (error: string) => ({
@@ -128,12 +130,12 @@ export const fetchFlags = () => {
     };
 };
 
-export const getFlagOfTheDay = (id: string) => {
+export const getFlagOfTheDay = (id: string, lang: string) => {
     return async (dispatch: Dispatch) => {
         dispatch(startGuessRequest());
 
         try {
-            const response = await fetch(apiUrl + '/startGuess?date=' + getFormattedDate() + '&id=' + id);
+            const response = await fetch(apiUrl + '/startGuess?date=' + getFormattedDate() + '&id=' + id + '&lang=' + lang);
             if (response.status >= 300) {
                 dispatch(startGuessFailure(response));
             }

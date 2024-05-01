@@ -152,3 +152,17 @@ func CheckIfGameFinished(db gorm.DB, player model.Player, date string) string {
 	}
 	return ""
 }
+
+func GetAnswers(db gorm.DB, date string, lang string) []string {
+	var game model.Game
+	db.Where("DATE(date) = ?", date).First(&game)
+	var flags []model.DrawFlags
+	db.Where("game_id = ?", game.Id).Order("step asc").Find(&flags)
+	var answers []string
+	for _, flag := range flags {
+		var flagName model.FlagName
+		db.Where("code = ? AND lang = ?", flag.Code, lang).First(&flagName)
+		answers = append(answers, flagName.Name)
+	}
+	return answers
+}

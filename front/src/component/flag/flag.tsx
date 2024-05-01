@@ -13,7 +13,6 @@ const mapStateToProps = (state: RootState) => ({
     flags: state.flag.flags,
     loading: state.flag.loading,
     error: state.flag.error,
-    maxStep: state.flag.maxStep,
     randomFlags: state.flag.randomFlags,
     step: state.flag.step,
     correctGuess: state.flag.correctGuess,
@@ -23,8 +22,6 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 const mapDispatchToProps = {
-    fetchFlags,
-    getFlagOfTheDay,
     guess,
     updateStep
 };
@@ -35,7 +32,7 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 const today = new Date().toLocaleDateString("en-US");
 
 // @ts-ignore
-const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, correctGuess, isWin, isLoose, loading, error, tries, getFlagOfTheDay, fetchFlags, guess, updateStep }) => {
+const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, correctGuess, isWin, isLoose, loading, error, guess, updateStep }) => {
     const [flagName, setFlagName] = useState("")
     const [guesses, setGuesses] = useState<string[]>([])
     const [hints, setHints] = useState<string[]>([])
@@ -86,7 +83,6 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, cor
     }, [correctGuess]);
 
     useEffect(() => {
-        console.log(isWin, isLoose, currentDay)
         if (!profile.lang) {
             navigate('/')
         }
@@ -94,6 +90,14 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, cor
             return
         }
         if (isWin) {
+            setCurrentDay({
+                ...currentDay,
+                [today]: {
+                    ...currentDay[today],
+                    guesses: [],
+                    guessed: [...currentDay[today].guessed, {step, flagName}]
+                }
+            })
             navigate('/win')
         }
 
@@ -140,26 +144,24 @@ const FlagComponent: React.FC<PropsFromRedux> = ({ flags, randomFlags, step, cor
 
     return (
         <div className={'w-full text-center text-black dark:text-white pt-2'}>
-            <div className={'flex justify-center items-center md:w-2/6 mx-auto py-3'}>
+            <div className={'flex justify-center items-center mx-auto py-3'}>
                 <NavLink to="/" className={'p-1 mr-16 shadow-lg dark:bg-slate-700 rounded'}>
                     <svg className="h-8 w-8" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">  <path stroke="none" d="M0 0h24v24H0z"/>  <polyline points="5 12 3 12 12 3 21 12 19 12" />  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" /></svg>
                 </NavLink>
-                <div className={'text-2xl'}>{t('game.try', {guesses: tries + 1, maxGuesses})}</div>
+                <div className={'text-2xl'}>{t('game.try', {guesses: guesses.length + 1, maxGuesses})}</div>
             </div>
-            <div className={'flex justify-center items-center'}>
+            <div className={'flex justify-center items-center py-1 md:py-3'}>
                 {getGuessedFlags().map((flag: any, index) =>
-                    flag.length > 0 ? <div key={index} className={'mx-2 mb-2 w-16'}>
+                    flag.length > 0 ? <div key={index} className={'mx-2 mb-2 w-20 md:w-24'}>
                         <img src={flag} alt={t('game.guessedFlagAlt')} className={'border'}/>
-                    </div>: <div key={index}></div>
+                    </div>: <div key={index} className={'mx-2 mb-2 w-20 md:w-24'}></div>
                 )}
             </div>
             <div key={randomFlags[step]} className={'flex flex-col items-center'}>
-                <div className={'md:w-2/6'}>
+                <div className={'flex flex-col items-center'}>
                     <img
-                        className={'px-4'}
+                        className={'px-4 max-h-[300px]'}
                         src={randomFlags[step]}
-                        height="120"
-                        width="350"
                         alt={t('game.flagAlt')} />
                     <AutocompleteInput options={options} onSelect={(option) => updateFlagName(option)} />
                     <HintsComponent hints={hints}></HintsComponent>

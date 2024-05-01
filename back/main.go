@@ -32,13 +32,20 @@ type GuessResponse struct {
 	CorrectGuess bool     `json:"correctGuess"`
 	Hint         []string `json:"hint,omitempty"`
 	Tries        int      `json:"tries"`
-	Win          string   `json:"win"`
+	Win          string   `json:"win,omitempty"`
+}
+
+type EndGuessResponse struct {
+	CorrectGuess bool     `json:"correctGuess"`
+	IsFinished   string   `json:"isFinished"`
+	Answers      []string `json:"answers"`
 }
 
 type StartGuessResponse struct {
 	Images     []string `json:"images"`
 	Hint       []string `json:"hint,omitempty"`
 	IsFinished string   `json:"isFinished,omitempty"`
+	Answers    []string `json:"answers,omitempty"`
 }
 
 var Flags []model.Flag
@@ -141,6 +148,11 @@ func handleStartGuess(c *gin.Context) {
 		images = append(images, flag.Image)
 	}
 	isFinished := game.CheckIfGameFinished(db, *player, currentDate)
+	if isFinished == "WIN" || isFinished == "LOOSE" {
+		response := StartGuessResponse{Images: images, IsFinished: isFinished, Answers: game.GetAnswers(db, currentDate, game.GetLang(lang))}
+		c.JSON(http.StatusOK, response)
+		return
+	}
 	response := StartGuessResponse{Images: images, Hint: game.HandleStartGuess(db, flags, *player, game.GetLang(lang), currentDate), IsFinished: isFinished}
 	c.JSON(http.StatusOK, response)
 }
@@ -169,6 +181,13 @@ func handleGuess(c *gin.Context) {
 	}
 	// Prepare the response
 	isCorrect, hint, tries := game.HandleGuess(db, flags, guessRequest.Guess, game.GetLang(guessRequest.Lang), guessRequest.Date, *player)
+	isFinished := game.CheckIfGameFinished(db, *player, guessRequest.Date)
+	if isFinished == "WIN" || isFinished == "LOOSE" {
+		response := EndGuessResponse{CorrectGuess: isCorrect, IsFinished: isFinished, Answers: game.GetAnswers(db, guessRequest.Date, game.GetLang(guessRequest.Lang))}
+		c.JSON(http.StatusOK, response)
+		return
+
+	}
 	response := GuessResponse{CorrectGuess: isCorrect, Hint: hint, Tries: tries}
 	c.JSON(http.StatusOK, response)
 }

@@ -29,7 +29,7 @@ const initialState: FlagState = {
     isWin: false,
     isLoose: false,
     profile: null,
-    tries: 0
+    tries: 0,
 };
 
 const flagReducer = (state = initialState, action: any): FlagState => {
@@ -44,15 +44,15 @@ const flagReducer = (state = initialState, action: any): FlagState => {
         case 'FETCH_FLAGS_SUCCESS':
             return { ...state, loading: false, flags: action.payload };
         case 'GUESS_SUCCESS': {
-            const answers = [...state.answers]
-            if (action.correctGuess) {
-                answers.push(action.answer)
+            console.log(action.isWin)
+            return { ...state,
+                loading: false,
+                correctGuess: { ...state.correctGuess, [state.step]: {correctGuess: action.correctGuess, hints: action.hint}},
+                tries: action.tries,
+                answers: action.answers,
+                isWin: action.isFinished === 'WIN',
+                isLoose: action.isFinished === 'LOOSE',
             }
-            let isWin = false
-            if (state.step === state.maxStep - 1 && action.correctGuess) {
-                isWin = true
-            }
-            return { ...state, loading: false, correctGuess: { ...state.correctGuess, [state.step]: {correctGuess: action.correctGuess, hints: action.hint}}, answers, isWin, tries: action.tries };
         }
         case 'START_GUESS_SUCCESS':
             return { ...state,
@@ -63,7 +63,8 @@ const flagReducer = (state = initialState, action: any): FlagState => {
                 correctGuess: {
                     ...state.correctGuess,
                     [state.step]: {correctGuess: false, hints: action.payload.hint ?? []}
-                }
+                },
+                answers: action.payload.answers
             }
         case 'PROFILE_REQUEST_SUCCESS':
             return { ...state, loading: false, profile: action.payload };

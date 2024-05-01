@@ -36,20 +36,15 @@ const WinComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers, isWin, l
         return (<div>{t('loading')}</div>)
     }
 
-    const getFlagName = (step: number) => {
-        if (currentDay[today] && currentDay[today].guessed[step]) {
-            return currentDay[today].guessed[step].flagName
-        }
-        return '?'
-    }
-
     return (
         <>
             <ConfettiExplosion />
             <div className={'text-center dark:text-white mt-10 flex flex-col justify-around h-5/6'}>
                 <div>
                     <h2 className={'font-bold text-4xl flex justify-center'}>
-                        <img src="coupe.svg" alt="Coupe" className={'w-8 color-[#FCDC12]'}/>{t('win.title')}<img src="coupe.svg" alt="Coupe" className={'w-8'}/>
+                        <img src="coupe.svg" alt="Coupe" className={'w-8 color-[#FCDC12]'}/>
+                        {t('win.title')}
+                        <img src="coupe.svg" alt="Coupe" className={'w-8'}/>
                     </h2>
                 </div>
                 <div className={'flex justify-center'}>
@@ -58,7 +53,7 @@ const WinComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers, isWin, l
                             <div className={'h-24 flex justify-center'}>
                                 <img src={flag}  alt="Flag guessed" className={'p-1 rounded shadow-xl h-4/5'}/>
                             </div>
-                            <div>{getFlagName(index)}</div>
+                            <div>{answers[index]}</div>
                         </div>
                     ))}
                 </div>
