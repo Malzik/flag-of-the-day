@@ -4,7 +4,7 @@ import {Outlet} from "react-router-dom";
 
 export function Template() {
     return (
-        <div className={'bg-slate-100 dark:bg-slate-800 h-screen'}>
+        <div className={'bg-white dark:bg-black h-screen'}>
             <Header></Header>
             <Outlet/>
         </div>
