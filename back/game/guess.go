@@ -10,10 +10,10 @@ import (
 	"unicode"
 )
 
-func HandleGuess(db gorm.DB, flags []model.Flag, guess string, lang string, currentDate string, player model.Player) (bool, []string, int) {
+func HandleGuess(db gorm.DB, flags []model.Flag, guess string, lang string, currentDate string, player model.Player) (bool, []string, int, int) {
 	playerGame := getPlayerGame(db, player, currentDate)
 	if len(playerGame.IsWin) != 0 {
-		return false, nil, 0
+		return false, nil, 0, 0
 	}
 	currentStep, err := getCurrentStep(db, playerGame)
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
@@ -26,7 +26,7 @@ func HandleGuess(db gorm.DB, flags []model.Flag, guess string, lang string, curr
 	var guesses []string
 	err = json.Unmarshal([]byte(currentStep.Guesses), &guesses)
 	if err != nil {
-		return false, nil, 0
+		return false, nil, 0, 0
 	}
 	guesses = append(guesses, guess)
 	guessesJSON, _ := json.Marshal(guesses)
@@ -34,6 +34,9 @@ func HandleGuess(db gorm.DB, flags []model.Flag, guess string, lang string, curr
 	isCorrect := checkGuess(db, currentFlag, guess, lang)
 
 	if isCorrect == true {
+		var points int = player.Points
+		points += 6 - len(guesses)
+		db.Model(player).Update("points", points)
 		if currentStep.Step == 2 {
 			db.Model(&playerGame).Update("is_win", "WIN")
 			db.Model(&player).Update("streak", player.Streak+1)
@@ -43,13 +46,13 @@ func HandleGuess(db gorm.DB, flags []model.Flag, guess string, lang string, curr
 			nextStep := model.PlayerGuesses{PlayerGameId: playerGame.Id, Step: currentStep.Step + 1, Guesses: string(guessesJSON)}
 			db.Create(&nextStep)
 		}
-		return isCorrect, nil, 0
+		return isCorrect, nil, 0, 6 - len(guesses)
 	} else if len(guesses) == 5 {
 		db.Model(&playerGame).Update("is_win", "LOOSE")
 		db.Model(&player).Update("streak", 0)
 	}
 
-	return isCorrect, getHints(&db, currentFlag, lang, len(guesses)), len(guesses)
+	return isCorrect, getHints(&db, currentFlag, lang, len(guesses)), len(guesses), 0
 }
 
 func HandleStartGuess(db gorm.DB, flags []model.Flag, player model.Player, lang string, currentDate string) []string {

@@ -9,7 +9,7 @@ interface FlagState {
     answers: string[];
     isWin: boolean;
     isLoose: boolean;
-    profile: { id: string, streak: number } | null;
+    profile: { id: string, streak: number, points: number } | null;
     tries: number;
 }
 

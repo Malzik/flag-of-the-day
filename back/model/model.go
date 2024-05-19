@@ -36,6 +36,7 @@ type DrawFlags struct {
 type Player struct {
 	Id     string `gorm:"primaryKey"`
 	Streak int
+	Points int
 }
 
 type PlayerGame struct {

@@ -1,7 +1,8 @@
 {
   "home": {
     "title": "FLAG OF THE DAY",
-    "startGame": "Drapeaux du jour"
+    "startGame": "Drapeaux du jour",
+    "points": "Vous avez {points} points"
   },
   "game": {
     "try": "Tentative n° {guesses} / {maxGuesses}",

@@ -26,6 +26,7 @@ type GuessRequest struct {
 type ProfileResponse struct {
 	Id     string `json:"id"`
 	Streak int    `json:"streak"`
+	Points int    `json:"points"`
 }
 
 type GuessResponse struct {
@@ -33,12 +34,14 @@ type GuessResponse struct {
 	Hint         []string `json:"hint,omitempty"`
 	Tries        int      `json:"tries"`
 	Win          string   `json:"win,omitempty"`
+	Points       int      `json:"points"`
 }
 
 type EndGuessResponse struct {
 	CorrectGuess bool     `json:"correctGuess"`
 	IsFinished   string   `json:"isFinished"`
 	Answers      []string `json:"answers"`
+	Points       int      `json:"points"`
 }
 
 type StartGuessResponse struct {
@@ -61,7 +64,7 @@ func handleProfile(c *gin.Context) {
 		playerId = uuid.New().String()
 		db.Create(model.Player{Id: playerId, Streak: 0})
 	}
-	response := ProfileResponse{Id: playerId, Streak: player.Streak}
+	response := ProfileResponse{Id: playerId, Streak: player.Streak, Points: player.Points}
 	c.JSON(http.StatusOK, response)
 }
 
@@ -180,15 +183,19 @@ func handleGuess(c *gin.Context) {
 		return
 	}
 	// Prepare the response
-	isCorrect, hint, tries := game.HandleGuess(db, flags, guessRequest.Guess, game.GetLang(guessRequest.Lang), guessRequest.Date, *player)
+	isCorrect, hint, tries, points := game.HandleGuess(db, flags, guessRequest.Guess, game.GetLang(guessRequest.Lang), guessRequest.Date, *player)
 	isFinished := game.CheckIfGameFinished(db, *player, guessRequest.Date)
 	if isFinished == "WIN" || isFinished == "LOOSE" {
-		response := EndGuessResponse{CorrectGuess: isCorrect, IsFinished: isFinished, Answers: game.GetAnswers(db, guessRequest.Date, game.GetLang(guessRequest.Lang))}
+		response := EndGuessResponse{
+			CorrectGuess: isCorrect,
+			IsFinished:   isFinished,
+			Answers:      game.GetAnswers(db, guessRequest.Date, game.GetLang(guessRequest.Lang)),
+			Points:       points,
+		}
 		c.JSON(http.StatusOK, response)
 		return
-
 	}
-	response := GuessResponse{CorrectGuess: isCorrect, Hint: hint, Tries: tries}
+	response := GuessResponse{CorrectGuess: isCorrect, Hint: hint, Tries: tries, Points: points}
 	c.JSON(http.StatusOK, response)
 }
 

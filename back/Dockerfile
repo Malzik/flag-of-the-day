@@ -22,6 +22,9 @@ ENV GIN_MODE=release
 # Copy the binary from the builder stage
 COPY --from=builder /usr/src/app/main /app/
 
+# Copy the .env file from your local machine to the Docker image
+COPY --from=builder /usr/src/app/.env /app/
+
 # Expose port 8082 to the outside world
 EXPOSE 8082
 
