@@ -1,7 +1,12 @@
 {
   "home": {
     "title": "FLAG OF THE DAY",
-    "startGame": "Start the game"
+    "startGame": "Start the game",
+    "win": "Victory!",
+    "loose": "Fail!",
+    "try": "{tries} try",
+    "tries": "{tries} tries",
+    "lastScore": "My last games"
   },
   "game": {
     "try": "Try n° {guesses} / {maxGuesses}",

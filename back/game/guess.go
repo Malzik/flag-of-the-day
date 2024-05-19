@@ -30,11 +30,11 @@ func HandleGuess(db gorm.DB, flags []model.Flag, guess string, lang string, curr
 	}
 	guesses = append(guesses, guess)
 	guessesJSON, _ := json.Marshal(guesses)
-	db.Model(&currentStep).Where("step = ?", currentStep.Step).Update("guesses", string(guessesJSON))
+	db.Model(&currentStep).Where("step = ? and player_game_id = ?", currentStep.Step, playerGame.Id).Update("guesses", string(guessesJSON))
 	isCorrect := checkGuess(db, currentFlag, guess, lang)
 
 	if isCorrect == true {
-		var points int = player.Points
+		var points = player.Points
 		points += 6 - len(guesses)
 		db.Model(player).Update("points", points)
 		if currentStep.Step == 2 {
@@ -168,4 +168,32 @@ func GetAnswers(db gorm.DB, date string, lang string) []string {
 		answers = append(answers, flagName.Name)
 	}
 	return answers
+}
+
+func GetHistory(db gorm.DB, player model.Player) []model.History {
+	var playerGames []model.PlayerGame
+	db.Where("player_id = ?", player.Id).Order("id desc").Limit(3).Preload("PlayerGuesses").Find(&playerGames)
+	var history []model.History
+	for _, playerGame := range playerGames {
+		var game model.Game
+		db.Where("id = ?", playerGame.GameId).First(&game)
+		var drawFlags []model.DrawFlags
+		db.Joins("Flag").Where("game_id = ?", game.Id).Order("step asc").Find(&drawFlags)
+		var playerGuesses []model.PlayerGuesses
+		db.Where("player_game_id = ?", playerGame.Id).Find(&playerGuesses)
+		var historyFlags []model.HistoryFlag
+		for _, drawFlag := range drawFlags {
+			var guesses []string
+			for _, guess := range playerGuesses {
+				if guess.Step == drawFlag.Step {
+					print(guess.Guesses)
+					json.Unmarshal([]byte(guess.Guesses), &guesses)
+					break
+				}
+			}
+			historyFlags = append(historyFlags, model.HistoryFlag{Flag: drawFlag.Flag.Image, Tries: len(guesses)})
+		}
+		history = append(history, model.History{Result: playerGame.IsWin, Date: game.Date, Points: player.Points, Flags: historyFlags})
+	}
+	return history
 }

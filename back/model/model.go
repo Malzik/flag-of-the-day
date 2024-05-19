@@ -31,6 +31,7 @@ type DrawFlags struct {
 	GameId uint   `gorm:"foreignKey:GameId"`
 	Code   string `gorm:"foreignKey:Code"`
 	Step   int
+	Flag   Flag `gorm:"foreignKey:Code"`
 }
 
 type Player struct {
@@ -40,14 +41,29 @@ type Player struct {
 }
 
 type PlayerGame struct {
-	Id       uint   `gorm:"primaryKey"`
-	PlayerId string `gorm:"foreignKey:PlayerId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	GameId   uint   `gorm:"foreignKey:GameId"`
-	IsWin    string
+	Id            uint   `gorm:"primaryKey"`
+	PlayerId      string `gorm:"foreignKey:PlayerId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	GameId        uint   `gorm:"foreignKey:GameId"`
+	IsWin         string
+	PlayerGuesses []PlayerGuesses `gorm:"foreignKey:PlayerGameId"`
 }
 
 type PlayerGuesses struct {
 	PlayerGameId uint   `gorm:"foreignKey:PlayerGameId;uniqueIndex:idx_game_step;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Step         int    `gorm:"uniqueIndex:idx_game_step"`
 	Guesses      string `gorm:"type:json"`
+}
+
+// Internal structs
+
+type History struct {
+	Result string        `json:"result"`
+	Date   time.Time     `json:"date"`
+	Points int           `json:"points"`
+	Flags  []HistoryFlag `json:"flags"`
+}
+
+type HistoryFlag struct {
+	Flag  string `json:"flag"`
+	Tries int    `json:"tries"`
 }

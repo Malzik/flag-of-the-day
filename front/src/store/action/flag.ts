@@ -27,7 +27,7 @@ const profileRequest = () => ({
 
 const profileRequestSuccess = (data: Player[]) => ({
     type: PROFILE_REQUEST_SUCCESS,
-    payload: data,
+    profile: data,
 });
 
 const profileRequestFailure = (error: string) => ({

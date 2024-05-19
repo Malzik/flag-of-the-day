@@ -24,9 +24,10 @@ type GuessRequest struct {
 }
 
 type ProfileResponse struct {
-	Id     string `json:"id"`
-	Streak int    `json:"streak"`
-	Points int    `json:"points"`
+	Id      string          `json:"id"`
+	Streak  int             `json:"streak"`
+	Points  int             `json:"points"`
+	History []model.History `json:"history"`
 }
 
 type GuessResponse struct {
@@ -64,7 +65,8 @@ func handleProfile(c *gin.Context) {
 		playerId = uuid.New().String()
 		db.Create(model.Player{Id: playerId, Streak: 0})
 	}
-	response := ProfileResponse{Id: playerId, Streak: player.Streak, Points: player.Points}
+	history := game.GetHistory(db, player)
+	response := ProfileResponse{Id: playerId, Streak: player.Streak, Points: player.Points, History: history}
 	c.JSON(http.StatusOK, response)
 }
 

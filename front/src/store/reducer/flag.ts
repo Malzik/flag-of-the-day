@@ -1,3 +1,5 @@
+import {History} from "../model/flag";
+
 interface FlagState {
     flags: any;
     randomFlags: string[]
@@ -9,7 +11,7 @@ interface FlagState {
     answers: string[];
     isWin: boolean;
     isLoose: boolean;
-    profile: { id: string, streak: number, points: number } | null;
+    profile: { id: string, streak: number, points: number, history: History[] } | null;
     tries: number;
 }
 
@@ -67,7 +69,7 @@ const flagReducer = (state = initialState, action: any): FlagState => {
                 answers: action.payload.answers
             }
         case 'PROFILE_REQUEST_SUCCESS':
-            return { ...state, loading: false, profile: action.payload };
+            return { ...state, loading: false, profile: action.profile };
         case 'FETCH_FLAGS_FAILURE':
         case 'GUESS_FAILURE':
         case 'START_GUESS_FAILURE':

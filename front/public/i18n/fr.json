@@ -1,8 +1,12 @@
 {
   "home": {
     "title": "FLAG OF THE DAY",
-    "startGame": "Drapeaux du jour",
-    "points": "Vous avez {points} points"
+    "startGame": "Demarrer la partie",
+    "win": "Réussi !",
+    "loose": "Echec !",
+    "try": "{tries} essai",
+    "tries": "{tries} essais",
+    "lastScore": "Mes dernières parties"
   },
   "game": {
     "try": "Tentative n° {guesses} / {maxGuesses}",
