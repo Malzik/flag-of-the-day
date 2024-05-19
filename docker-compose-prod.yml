@@ -37,6 +37,7 @@ services:
     restart: unless-stopped
     networks:
       - traefik_webgateway
+      - database
     ports:
       - "8082:8082"
     labels:
@@ -63,6 +64,9 @@ services:
   fotd-db:
     image: mariadb:11.3.2
     container_name: fotd-db
+    restart: unless-stopped
+    networks:
+      - database
     volumes:
       - "./volumes/db:/var/lib/mysql"
       - "./database/:/docker-entrypoint-initdb.d/"
@@ -77,3 +81,4 @@ services:
 networks:
   traefik_webgateway:
     external: true
+  database:

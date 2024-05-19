@@ -86,15 +86,15 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, history, 
     }
 
     return (
-        <div className={'w-full h-full text-center bg-blue-300 container mx-auto flex flex-col'}>
-            <div className='flex justify-between px-5 py-6 items-center'>
+        <div className={'w-full h-full text-center bg-blue-300 flex flex-col'}>
+            <div className='flex justify-between px-5 py-6 items-center container mx-auto'>
                 <span className={'font-extrabold'}>
                 {t('home.title')}
                 </span>
                 <FlameCounter count={streak ?? 0} points={points}/>
             </div>
             <div className={'py-5 flex-1 flex flex-col gap-5 text-2xl text-black dark:text-white bg-slate-100 dark:bg-slate-800 rounded-t-xl'}>
-                <div className='flex justify-between px-5'>
+                <div className='flex justify-between px-5 container mx-auto'>
                         <div className={'flex items-center shadow-md p-2 rounded-md'}>
                             <img src="https://flagcdn.com/fr.svg" alt="French flag" className={`px-2 rounded ${currentLang === 'fr' ? "h-6" : "h-4 grayscale"}`} onClick={() => updateLang('fr')}/>
                             <img src="https://flagcdn.com/gb.svg" alt="UK flag" className={`px-2 rounded ${currentLang === 'en' ? "h-6" : "h-4 grayscale"}`} onClick={() => updateLang('en')}/>
@@ -112,9 +112,11 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, history, 
                             </button>
                         </div>
                 </div>
-                <h2>{t('home.lastScore')}</h2>
-                <div className='flex-1 w-full flex flex-col gap-4 px-5'>
-                    {history?.map((day, key) => (<HistoryComponent history={day} key={key}/>))}
+                <div className={'container mx-auto flex flex-col gap-5 flex-1'}>
+                    <h2>{t('home.lastScore')}</h2>
+                    <div className='flex-1 w-full flex flex-col gap-4 px-5'>
+                        {history?.map((day, key) => (<HistoryComponent history={day} key={key}/>))}
+                    </div>
                 </div>
                 <div className='shrink-0'>
                     <Button label={t('home.startGame')} onClick={() => startGame()}></Button>
