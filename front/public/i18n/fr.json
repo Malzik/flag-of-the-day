@@ -6,7 +6,9 @@
     "loose": "Echec !",
     "try": "{tries} essai",
     "tries": "{tries} essais",
-    "lastScore": "Mes dernières parties"
+    "lastScore": "Mes dernières parties",
+    "welcome": "Bienvenue dans votre première partie !",
+    "points": "{points} pts"
   },
   "game": {
     "try": "Tentative n° {guesses} / {maxGuesses}",

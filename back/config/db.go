@@ -15,7 +15,7 @@ var (
 	once sync.Once
 )
 
-func Db() gorm.DB {
+func Db() *gorm.DB {
 	once.Do(func() {
 		err := godotenv.Load()
 		if err != nil {
@@ -29,5 +29,5 @@ func Db() gorm.DB {
 		}
 		print("Connection succesful")
 	})
-	return *db
+	return db
 }

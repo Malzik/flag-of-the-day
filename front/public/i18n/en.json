@@ -6,7 +6,8 @@
     "loose": "Fail!",
     "try": "{tries} try",
     "tries": "{tries} tries",
-    "lastScore": "My last games"
+    "lastScore": "My last games",
+    "welcome": "Welcome to your first game!"
   },
   "game": {
     "try": "Try n° {guesses} / {maxGuesses}",

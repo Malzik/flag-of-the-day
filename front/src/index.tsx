@@ -9,9 +9,8 @@ import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import {Template} from "./component/template/Template";
 import FlagComponent from "./component/flag/flag";
 import HomeComponent, {loader} from "./component/home/home";
-import WinComponent from "./component/win/win";
-import LooseComponent from "./component/loose/loose";
-import useTranslations from "./i18n/useTranslation";
+import WinComponent from "./component/flag/win/win";
+import LooseComponent from "./component/flag/loose/loose";
 import ErrorComponent from "./component/error/error";
 
 const root = ReactDOM.createRoot(

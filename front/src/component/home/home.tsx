@@ -87,43 +87,53 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, history, 
 
     return (
         <div className={'w-full h-full text-center bg-blue-300 flex flex-col'}>
-            <div className='flex justify-between px-5 py-6 items-center container mx-auto'>
+            <div className='flex justify-between px-5 py-4 md:py-6 items-center container mx-auto'>
                 <span className={'font-extrabold'}>
                 {t('home.title')}
                 </span>
                 <FlameCounter count={streak ?? 0} points={points}/>
             </div>
-            <div className={'py-5 flex-1 flex flex-col gap-5 text-2xl text-black dark:text-white bg-slate-100 dark:bg-slate-800 rounded-t-xl'}>
+            <div
+                className={'py-5 flex-1 flex flex-col gap-5 text-2xl text-black dark:text-white bg-slate-100 dark:bg-slate-800 rounded-t-xl'}>
                 <div className='flex justify-between px-5 container mx-auto'>
-                        <div className={'flex items-center shadow-md p-2 rounded-md'}>
-                            <img src="https://flagcdn.com/fr.svg" alt="French flag" className={`px-2 rounded ${currentLang === 'fr' ? "h-6" : "h-4 grayscale"}`} onClick={() => updateLang('fr')}/>
-                            <img src="https://flagcdn.com/gb.svg" alt="UK flag" className={`px-2 rounded ${currentLang === 'en' ? "h-6" : "h-4 grayscale"}`} onClick={() => updateLang('en')}/>
-                        </div>
-                        <div>
-                            <button onClick={toggleDarkMode} className='button w-12 h-12 bg-blue-500 rounded-full cursor-pointer select-none
+                    <div className={'flex items-center shadow-md p-2 rounded-md'}>
+                        <img src="https://flagcdn.com/fr.svg" alt="French flag"
+                             className={`px-2 rounded ${currentLang === 'fr' ? "h-6" : "h-4 grayscale"}`}
+                             onClick={() => updateLang('fr')}/>
+                        <img src="https://flagcdn.com/gb.svg" alt="UK flag"
+                             className={`px-2 rounded ${currentLang === 'en' ? "h-6" : "h-4 grayscale"}`}
+                             onClick={() => updateLang('en')}/>
+                    </div>
+                    <div>
+                        <button onClick={toggleDarkMode} className='button w-12 h-12 bg-blue-500 rounded-full cursor-pointer select-none
                             active:translate-y-2  active:[box-shadow:0_0px_0_0_#1b6ff8,0_0px_0_0_#1b70f841]
                             active:border-b-[0px]
                             transition-all duration-150 [box-shadow:0_8px_0_0_#1b6ff8,0_13px_0_0_#1b70f841]
                             border-[1px] border-blue-400'>
-                                {darkSide ?
-                                (<span className='flex flex-col justify-center items-center h-full text-white font-bold text-lg '>☀️</span>)
-                                :(<span className='flex flex-col justify-center items-center h-full text-white font-bold text-lg '>🌙</span>)
-                                }
-                            </button>
-                        </div>
-                </div>
-                <div className={'container mx-auto flex flex-col gap-5 flex-1'}>
-                    <h2>{t('home.lastScore')}</h2>
-                    <div className='flex-1 w-full flex flex-col gap-4 px-5'>
-                        {history?.map((day, key) => (<HistoryComponent history={day} key={key}/>))}
+                            {darkSide ?
+                                (<span
+                                    className='flex flex-col justify-center items-center h-full text-white font-bold text-lg '>☀️</span>)
+                                : (<span
+                                    className='flex flex-col justify-center items-center h-full text-white font-bold text-lg '>🌙</span>)
+                            }
+                        </button>
                     </div>
                 </div>
+                {!!history ?
+                    <div className={'container mx-auto flex flex-col gap-3 md:gap-5 flex-1'}>
+                        <h2>{t('home.lastScore')}</h2>
+                        <div className='flex-1 w-full flex flex-col gap-4 px-5'>
+                            {history?.map((day, key) => (<HistoryComponent history={day} key={key}/>))}
+                        </div>
+                    </div> : <div className={"mt-16 mb-32"}>{t('home.welcome')}</div>
+                }
                 <div className='shrink-0'>
                     <Button label={t('home.startGame')} onClick={() => startGame()}></Button>
                 </div>
             </div>
         </div>
-    );
+    )
+        ;
 };
 
 export default connector(HomeComponent);

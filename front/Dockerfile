@@ -1,4 +1,4 @@
-FROM node:16.13-alpine as build-stage
+FROM node:22.2.0-alpine as build-stage
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2
-FROM nginx:1.17.0-alpine
+FROM nginx:1.25.5-alpine
 WORKDIR /usr/share/nginx/html
 
 RUN rm -rf ./*

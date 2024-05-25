@@ -1,11 +1,9 @@
-version: '3'
-
 services:
   fotd-front:
     container_name: 'fotd-front'
     build:
       context: ./front
-    depends_on: [reverse-proxy]
+    depends_on: [fotd-api]
     networks:
       - traefik_webgateway
     restart: unless-stopped
@@ -33,7 +31,7 @@ services:
     container_name: 'fotd-api'
     build:
       context: ./back
-    depends_on: [reverse-proxy, fotd-db]
+    depends_on: [fotd-db]
     restart: unless-stopped
     networks:
       - traefik_webgateway

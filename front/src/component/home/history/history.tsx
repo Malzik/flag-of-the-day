@@ -13,7 +13,15 @@ const HistoryComponent: React.FC<HistoryComponentProps> = ({ history }) => {
 
     return (
         <div className='bg-white dark:bg-slate-500 rounded-md shadow-md'>
-            <span>{ history.result == 'WIN' ? t('home.win') : t('home.loose')}</span>
+            <div className="relative flex justify-center items-center w-full">
+                <span
+                    className="text-center flex-grow">{history.result == 'WIN' ? t('home.win') : t('home.loose')}</span>
+                { history.points > 0 &&
+                    <span className="absolute right-5 text-sm text-green-600 font-bold">{t('home.points', {points: history.points})}</span>
+                }
+            </div>
+
+
             <div className='flex justify-evenly md:justify-center gap-2 lg:gap-5 py-2.5'>
                 {history.flags.map((flag, key) => (
                     <figure key={key}>

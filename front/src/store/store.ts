@@ -1,7 +1,7 @@
 // src/store.ts
 import {createStore, combineReducers, applyMiddleware} from 'redux';
 import flagReducer from "./reducer/flag";
-import thunk from "redux-thunk";
+import {thunk} from "redux-thunk";
 import {i18nSlice} from "../i18n/i18nSlice";
 
 const rootReducer = combineReducers({

@@ -1,10 +1,10 @@
 import React, {useEffect} from 'react';
 import { connect, ConnectedProps } from 'react-redux';
-import {RootState} from "../../store/store";
+import {RootState} from "../../../store/store";
 import {useNavigate} from "react-router-dom";
-import {useLocalStorage} from "../../utils/useLocalStorage";
+import {useLocalStorage} from "../../../utils/useLocalStorage";
 import ConfettiExplosion from "react-confetti-explosion";
-import useTranslations from "../../i18n/useTranslation";
+import useTranslations from "../../../i18n/useTranslation";
 
 const mapStateToProps = (state: RootState) => ({
     randomFlags: state.flag.randomFlags,

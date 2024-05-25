@@ -46,7 +46,6 @@ const flagReducer = (state = initialState, action: any): FlagState => {
         case 'FETCH_FLAGS_SUCCESS':
             return { ...state, loading: false, flags: action.payload };
         case 'GUESS_SUCCESS': {
-            console.log(action.isWin)
             return { ...state,
                 loading: false,
                 correctGuess: { ...state.correctGuess, [state.step]: {correctGuess: action.correctGuess, hints: action.hint}},
