@@ -35,10 +35,11 @@ type DrawFlags struct {
 }
 
 type Player struct {
-	Id     string `gorm:"primaryKey"`
-	Streak int
-	Points int
-	Name   string
+	Id            string `gorm:"primaryKey"`
+	Streak        int
+	LongestStreak int
+	Points        int
+	Name          string
 }
 
 type PlayerGame struct {
@@ -67,4 +68,9 @@ type History struct {
 type HistoryFlag struct {
 	Flag  string `json:"flag"`
 	Tries int    `json:"tries"`
+}
+
+type Leaderboard struct {
+	Streak []Player `json:"streak"`
+	Points []Player `json:"points"`
 }

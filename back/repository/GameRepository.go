@@ -132,7 +132,7 @@ func (r *GameRepository) GetFlagName(code string, lang string) model.FlagName {
 	return flagName
 }
 
-func (r *GameRepository) UpdatePlayerGame(playerGame model.PlayerGame, player model.Player, streak int) {
+func (r *GameRepository) UpdatePlayerGame(playerGame model.PlayerGame, player model.Player) {
 	r.db.Model(&playerGame).Update("is_win", playerGame.IsWin)
-	r.db.Model(&player).Update("streak", streak)
+	r.db.Model(&player).Updates(map[string]interface{}{"streak": player.Streak, "longest_streak": player.LongestStreak})
 }

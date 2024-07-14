@@ -58,11 +58,14 @@ func main() {
 
 	playerController := controller.NewPlayerController()
 	gameController := controller.NewGameController(Flags)
+	leaderboardController := controller.NewLeaderboardController()
 	r.GET("/api/profile", playerController.HandleProfile)
 	r.PUT("/api/profile/name", playerController.HandleUpdateName)
-	r.GET("/api/startGuess", gameController.HandleStartGuess)
 
+	r.GET("/api/startGuess", gameController.HandleStartGuess)
 	r.POST("/api/guess", gameController.HandleGuess)
+
+	r.GET("/api/leaderboard", leaderboardController.HandleLeaderboard)
 
 	// Start the HTTP server on port 8080
 	r.Run(":8082")

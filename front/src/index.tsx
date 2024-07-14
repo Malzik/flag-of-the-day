@@ -8,11 +8,11 @@ import store from "./store/store";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import {Template} from "./component/template/Template";
 import FlagComponent from "./component/flag/flag";
-import HomeComponent, {loader} from "./component/home/home";
+import HomeComponent, {loader as gameLoader} from "./component/home/home";
 import WinComponent from "./component/flag/win/win";
 import LooseComponent from "./component/flag/loose/loose";
 import ErrorComponent from "./component/error/error";
-import LeaderboardComponent from "./component/leaderboard/leaderboard";
+import LeaderboardComponent, {loader as leaderboardLoader} from "./component/leaderboard/leaderboard";
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -29,12 +29,12 @@ const router = createBrowserRouter([
             {
                 path: "/leaderboard",
                 element: <LeaderboardComponent/>,
-                loader: loader
+                loader: leaderboardLoader
             },
             {
                 path: "/game",
                 element: <FlagComponent/>,
-                loader: loader
+                loader: gameLoader
             },
             {
                 path: "/win",

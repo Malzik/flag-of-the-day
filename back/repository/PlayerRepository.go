@@ -59,3 +59,9 @@ func (r *PlayerRepository) UpdatePlayerPoints(player model.Player, points int) {
 func (r *PlayerRepository) UpdatePlayer(player *model.Player) {
 	r.db.Save(player)
 }
+
+func (r *PlayerRepository) GetAllPlayers() []model.Player {
+	var players []model.Player
+	r.db.Find(&players)
+	return players
+}

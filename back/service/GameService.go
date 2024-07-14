@@ -173,7 +173,11 @@ func (s *GameService) HandleGuess(date string, guess string, lang string, player
 		s.playerRepository.UpdatePlayerPoints(player, points)
 		if currentStep.Step == 2 {
 			playerGame.IsWin = "WIN"
-			s.gameRepository.UpdatePlayerGame(*playerGame, player, player.Streak+1)
+			player.Streak++
+			if player.Streak > player.LongestStreak {
+				player.LongestStreak = player.Streak
+			}
+			s.gameRepository.UpdatePlayerGame(*playerGame, player)
 		} else {
 			var newGuesses []string
 			guessesJSON, _ := json.Marshal(newGuesses)
@@ -182,7 +186,8 @@ func (s *GameService) HandleGuess(date string, guess string, lang string, player
 		}
 	} else if len(guesses) == 5 {
 		playerGame.IsWin = "LOOSE"
-		s.gameRepository.UpdatePlayerGame(*playerGame, player, 0)
+		player.Streak = 0
+		s.gameRepository.UpdatePlayerGame(*playerGame, player)
 	}
 	return model.GuessResponse{
 		CorrectGuess: isCorrect,

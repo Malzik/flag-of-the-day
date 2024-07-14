@@ -1,6 +1,6 @@
 // src/actions/counter.ts
 import {Dispatch} from "redux";
-import {Flag, Player} from "../model/flag";
+import {Flag, Leaderboards, Player} from "../model/flag";
 import {getFormattedDate} from "../../utils/normalize";
 
 const apiUrl = process.env.REACT_APP_API_URL
@@ -20,6 +20,9 @@ export const START_GUESS_FAILURE = 'START_GUESS_FAILURE';
 export const UPDATE_NAME_REQUEST = 'UPDATE_NAME_REQUEST';
 export const UPDATE_NAME_SUCCESS = 'UPDATE_NAME_SUCCESS';
 export const UPDATE_NAME_FAILURE = 'UPDATE_NAME_FAILURE';
+export const LEADERBOARD_REQUEST = 'LEADERBOARD_REQUEST';
+export const LEADERBOARD_SUCCESS = 'LEADERBOARD_SUCCESS';
+export const LEADERBOARD_FAILURE = 'LEADERBOARD_FAILURE';
 export const UPDATE_STEP = 'UPDATE_STEP';
 export const RESET_ERROR = 'RESET_ERROR';
 
@@ -86,6 +89,20 @@ const updateNameSuccess = (data: { name:string }) => ({
 
 const updateNameFailure = (error: string) => ({
     type: UPDATE_NAME_FAILURE,
+    payload: error,
+});
+
+const startLeaderboardRequest = () => ({
+    type: LEADERBOARD_REQUEST,
+});
+
+const startLeaderboardSuccess = (data: Leaderboards) => ({
+    type: LEADERBOARD_SUCCESS,
+    leaderboards: data,
+});
+
+const startLeaderboardFailure = (error: any) => ({
+    type: LEADERBOARD_FAILURE,
     payload: error,
 });
 
@@ -203,6 +220,23 @@ export const updateName = (name: string, id: string) => {
             dispatch(updateNameSuccess(data));
         } catch (error: any) {
             dispatch(updateNameFailure(error));
+        }
+    };
+};
+
+export const getLeaderboard = () => {
+    return async (dispatch: Dispatch) => {
+        dispatch(startLeaderboardRequest());
+
+        try {
+            const response = await fetch(apiUrl + '/leaderboard');
+            if (response.status >= 300) {
+                dispatch(startLeaderboardFailure(response));
+            }
+            const data = await response.json();
+            dispatch(startLeaderboardSuccess(data));
+        } catch (error: any) {
+            dispatch(startLeaderboardFailure(error));
         }
     };
 };

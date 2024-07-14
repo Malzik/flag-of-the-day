@@ -11,9 +11,20 @@ const LeaderboardStreakComponent: React.FC<LeaderboardStreakProps> = ({leaderboa
     const {t, init, status} = useTranslations()
     let leaderboardMode = LEADERBOARD_MODE.STREAK
 
+    leaderboard.sort((a: any, b: any) => b.streak - a.streak)
+
     return (
         <div className={'w-full h-full text-center flex flex-col'}>
             {leaderboardMode}
+
+            {leaderboard.map((player: {name:string, streak:number}, index: number) => {
+                return (
+                    <div key={index} className={'flex justify-around'}>
+                        <div>{player.name}</div>
+                        <div>{player.streak}</div>
+                    </div>
+                )
+            })}
         </div>
     )
 }
