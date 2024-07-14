@@ -4,6 +4,7 @@ type ProfileResponse struct {
 	Id      string    `json:"id"`
 	Streak  int       `json:"streak"`
 	Points  int       `json:"points"`
+	Name    string    `json:"name"`
 	History []History `json:"history"`
 }
 

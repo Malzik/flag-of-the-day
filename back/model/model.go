@@ -38,6 +38,7 @@ type Player struct {
 	Id     string `gorm:"primaryKey"`
 	Streak int
 	Points int
+	Name   string
 }
 
 type PlayerGame struct {

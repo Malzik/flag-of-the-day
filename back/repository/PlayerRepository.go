@@ -13,10 +13,6 @@ func NewPlayerRepository(db *gorm.DB) *PlayerRepository {
 	return &PlayerRepository{db: db}
 }
 
-//func (r *PlayerRepository) GetHistory(playerID string) ([]model.History, error) {
-//	// Your existing GetHistory code goes here
-//}
-
 func (r *PlayerRepository) GetPlayer(id string) (*model.Player, error) {
 	var player model.Player
 	if err := r.db.Where("id = ?", id).First(&player).Error; err != nil {
@@ -25,8 +21,8 @@ func (r *PlayerRepository) GetPlayer(id string) (*model.Player, error) {
 	return &player, nil
 }
 
-func (r *PlayerRepository) AddPlayer(id string) model.Player {
-	player := model.Player{Id: id, Streak: 0}
+func (r *PlayerRepository) AddPlayer(id string, name string) model.Player {
+	player := model.Player{Id: id, Streak: 0, Points: 0, Name: name}
 	r.db.Create(&player)
 	return player
 }
@@ -60,6 +56,6 @@ func (r *PlayerRepository) UpdatePlayerPoints(player model.Player, points int) {
 	r.db.Model(&player).Update("points", player.Points+points)
 }
 
-func AddPlayer(id string) {
-
+func (r *PlayerRepository) UpdatePlayer(player *model.Player) {
+	r.db.Save(player)
 }

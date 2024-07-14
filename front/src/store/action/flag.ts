@@ -17,6 +17,9 @@ export const GUESS_FAILURE = 'GUESS_FAILURE';
 export const START_GUESS_REQUEST = 'START_GUESS_REQUEST';
 export const START_GUESS_SUCCESS = 'START_GUESS_SUCCESS';
 export const START_GUESS_FAILURE = 'START_GUESS_FAILURE';
+export const UPDATE_NAME_REQUEST = 'UPDATE_NAME_REQUEST';
+export const UPDATE_NAME_SUCCESS = 'UPDATE_NAME_SUCCESS';
+export const UPDATE_NAME_FAILURE = 'UPDATE_NAME_FAILURE';
 export const UPDATE_STEP = 'UPDATE_STEP';
 export const RESET_ERROR = 'RESET_ERROR';
 
@@ -72,9 +75,24 @@ const guessFailure = (error: string) => ({
     payload: error,
 });
 
+const updateNameRequest = () => ({
+    type: UPDATE_NAME_REQUEST,
+});
+
+const updateNameSuccess = (data: { name:string }) => ({
+    type: UPDATE_NAME_SUCCESS,
+    name: data.name,
+});
+
+const updateNameFailure = (error: string) => ({
+    type: UPDATE_NAME_FAILURE,
+    payload: error,
+});
+
 const startGuessRequest = () => ({
     type: START_GUESS_REQUEST,
 });
+
 const startGuessSuccess = (data: Flag[]) => ({
     type: START_GUESS_SUCCESS,
     payload: data,
@@ -164,6 +182,27 @@ export const guess = (name: string, lang: string, id: string) => {
             dispatch(guessSuccess(data, name));
         } catch (error: any) {
             dispatch(guessFailure(error));
+        }
+    };
+};
+
+export const updateName = (name: string, id: string) => {
+    return async (dispatch: Dispatch) => {
+        dispatch(updateNameRequest());
+
+        try {
+            const response = await fetch(apiUrl + '/profile/name', {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({name, id})
+            });
+            const data = await response.json();
+            dispatch(updateNameSuccess(data));
+        } catch (error: any) {
+            dispatch(updateNameFailure(error));
         }
     };
 };

@@ -11,7 +11,7 @@ interface FlagState {
     answers: string[];
     isWin: boolean;
     isLoose: boolean;
-    profile: { id: string, streak: number, points: number, history: History[] } | null;
+    profile: { id: string, streak: number, points: number, history: History[], name: string } | null;
     tries: number;
 }
 
@@ -40,6 +40,7 @@ const flagReducer = (state = initialState, action: any): FlagState => {
         case 'GUESS_REQUEST':
         case 'START_GUESS_REQUEST':
         case 'PROFILE_REQUEST':
+        case 'UPDATE_NAME_REQUEST':
             return { ...state, loading: true, error: null };
         case "RESET_ERROR":
             return { ...state, error: null };
@@ -69,10 +70,14 @@ const flagReducer = (state = initialState, action: any): FlagState => {
             }
         case 'PROFILE_REQUEST_SUCCESS':
             return { ...state, loading: false, profile: action.profile };
+        case 'UPDATE_NAME_SUCCESS':
+            // @ts-ignore
+            return { ...state, loading: false, profile: { ...state.profile, name: action.name } };
         case 'FETCH_FLAGS_FAILURE':
         case 'GUESS_FAILURE':
         case 'START_GUESS_FAILURE':
         case 'PROFILE_REQUEST_FAILURE':
+        case 'UPDATE_NAME_FAILURE':
             return { ...state, loading: false, error: action.payload };
         case 'UPDATE_STEP':
             return { ...state, step: action.step };

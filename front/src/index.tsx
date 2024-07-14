@@ -12,6 +12,7 @@ import HomeComponent, {loader} from "./component/home/home";
 import WinComponent from "./component/flag/win/win";
 import LooseComponent from "./component/flag/loose/loose";
 import ErrorComponent from "./component/error/error";
+import LeaderboardComponent from "./component/leaderboard/leaderboard";
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -24,6 +25,11 @@ const router = createBrowserRouter([
             {
                 path: "",
                 element: <HomeComponent/>,
+            },
+            {
+                path: "/leaderboard",
+                element: <LeaderboardComponent/>,
+                loader: loader
             },
             {
                 path: "/game",

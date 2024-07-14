@@ -51,7 +51,6 @@ func main() {
 				break
 			}
 		}
-		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Status(204)
@@ -60,6 +59,7 @@ func main() {
 	playerController := controller.NewPlayerController()
 	gameController := controller.NewGameController(Flags)
 	r.GET("/api/profile", playerController.HandleProfile)
+	r.PUT("/api/profile/name", playerController.HandleUpdateName)
 	r.GET("/api/startGuess", gameController.HandleStartGuess)
 
 	r.POST("/api/guess", gameController.HandleGuess)

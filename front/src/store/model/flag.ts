@@ -14,3 +14,7 @@ export interface History {
     points: number;
     flags: { flag: string, tries: number}[];
 }
+export const LEADERBOARD_MODE = {
+    STREAK: 'streak',
+    POINTS: 'points'
+}

@@ -6,9 +6,12 @@ import (
 	"back/repository"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"math/rand"
 	"net/http"
+	"time"
 )
 
 type PlayerService struct {
@@ -20,7 +23,6 @@ func NewPlayerService() *PlayerService {
 }
 
 func (s *PlayerService) FindById(playerId string) model.Player {
-	print("playerId: ", playerId)
 	if len(playerId) != 0 {
 		player, err := s.playerRepository.GetPlayer(playerId)
 		if err == nil {
@@ -28,7 +30,12 @@ func (s *PlayerService) FindById(playerId string) model.Player {
 		}
 	}
 	playerId = uuid.New().String()
-	return s.playerRepository.AddPlayer(playerId)
+	rand.Seed(time.Now().UnixNano())
+	playerName := "Player"
+	for i := 0; i < 4; i++ {
+		playerName += fmt.Sprintf("%d", rand.Intn(10))
+	}
+	return s.playerRepository.AddPlayer(playerId, playerName)
 }
 
 func (s *PlayerService) CheckPlayer(playerId string) (*model.Player, *model.PlayerError) {
@@ -68,4 +75,10 @@ func (s *PlayerService) GetHistory(player model.Player) []model.History {
 		history = append(history, model.History{Result: playerGame.IsWin, Date: game.Date, Points: points, Flags: historyFlags})
 	}
 	return history
+}
+
+func (s *PlayerService) UpdateName(player *model.Player, name string) *model.Player {
+	player.Name = name
+	s.playerRepository.UpdatePlayer(player)
+	return player
 }

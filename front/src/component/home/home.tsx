@@ -4,22 +4,26 @@ import { connect, ConnectedProps } from 'react-redux';
 import store, {RootState} from "../../store/store";
 import {useNavigate} from "react-router-dom";
 import {useLocalStorage} from "../../utils/useLocalStorage";
-import {fetchFlags, getFlagOfTheDay, getProfile} from "../../store/action/flag";
+import {fetchFlags, getFlagOfTheDay, getProfile, updateName} from "../../store/action/flag";
 import FlameCounter from "../../utils/FlameCounter";
 import useTranslations from "../../i18n/useTranslation";
 import useDarkSide from "../../utils/useDarkSide";
 import { Button } from '../ui/button';
 import HistoryComponent from "./history/history";
+import EditNameComponent from "./name/editName";
+import {faTrophy} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 const mapStateToProps = (state: RootState) => ({
     id: state.flag.profile?.id,
     streak: state.flag.profile?.streak,
     points: state.flag.profile?.points,
+    name: state.flag.profile?.name,
     history: state.flag.profile?.history,
     loading: state.flag.loading,
     error: state.flag.error
 });
 
-const mapDispatchToProps = { getProfile };
+const mapDispatchToProps = { getProfile, updateName };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
@@ -43,13 +47,14 @@ export async function loader() {
 }
 
 const today = new Date().toLocaleDateString("en-US");
-const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, history, loading, error, getProfile }) => {
+const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, name, history, getProfile, updateName }) => {
     let navigate = useNavigate();
     const [colorTheme, setTheme] = useDarkSide();
     const [darkSide, setDarkSide] = useState(colorTheme === 'light');
     const [profile, setProfile] = useLocalStorage('profile', '')
     const [currentDay, setCurrentDay] = useLocalStorage('currentDay', '')
     const [currentLang, setCurrentLang] = useState(navigator.language.split('-')[0])
+    const [playerName, setPlayerName] = useState('')
     const {t, init, status} = useTranslations()
 
     useEffect(() => {
@@ -62,7 +67,9 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, history, 
 
     useEffect(() => {
         setProfile({...profile, lang: profile.lang || currentLang, id})
-    }, [id]);
+        setPlayerName(name ?? '')
+        console.log(name)
+    }, [id, name]);
 
     const toggleDarkMode = () => {
         setTheme(colorTheme);
@@ -75,7 +82,7 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, history, 
         navigate("/game")
     }
 
-    if (status === 'loading') {
+    if (status === 'loading' || !profile.id) {
         return (<div>{t('loading')}</div>)
     }
 
@@ -83,6 +90,15 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, history, 
         init(lang)
         setProfile({...profile, lang})
         setCurrentLang(lang)
+    }
+
+    const setName = (newName: string) => {
+        setPlayerName(newName)
+        updateName(newName, profile.id)
+    }
+
+    const goToLeadeboard = () => {
+        navigate('/leaderboard')
     }
 
     return (
@@ -127,8 +143,12 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, history, 
                         </div>
                     </div> : <div className={"mt-16 mb-32"}>{t('home.welcome')}</div>
                 }
-                <div className='shrink-0'>
+                <div className='shrink-0 flex justify-center gap-5'>
                     <Button label={t('home.startGame')} onClick={() => startGame()}></Button>
+                    <Button element={<FontAwesomeIcon icon={faTrophy} className="text-yellow-500"/>} onClick={() => goToLeadeboard()} width='w-14'></Button>
+                </div>
+                <div className={'text-sm container-sm mx-auto flex flex-col gap-3 md:gap-5 flex-1'}>
+                    <EditNameComponent name={playerName} setName={setName}></EditNameComponent>
                 </div>
             </div>
         </div>
