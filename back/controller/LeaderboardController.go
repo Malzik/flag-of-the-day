@@ -16,6 +16,7 @@ func NewLeaderboardController() *LeaderboardController {
 }
 
 func (co *LeaderboardController) HandleLeaderboard(c *gin.Context) {
-	response := co.leaderboardService.GetLeaderboard()
+	playerId := c.Query("id")
+	response := co.leaderboardService.GetLeaderboard(playerId)
 	c.JSON(http.StatusOK, response)
 }

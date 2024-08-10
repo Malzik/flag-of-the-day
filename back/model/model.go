@@ -40,6 +40,7 @@ type Player struct {
 	LongestStreak int
 	Points        int
 	Name          string
+	Highlight     int `gorm:"-"` // Not a database field
 }
 
 type PlayerGame struct {

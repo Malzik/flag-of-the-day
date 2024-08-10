@@ -8,18 +8,15 @@ interface LeaderboardStreakProps {
 }
 
 const LeaderboardStreakComponent: React.FC<LeaderboardStreakProps> = ({leaderboard}) => {
-    const {t, init, status} = useTranslations()
     let leaderboardMode = LEADERBOARD_MODE.STREAK
 
     leaderboard.sort((a: any, b: any) => b.streak - a.streak)
 
     return (
-        <div className={'w-full h-full text-center flex flex-col'}>
-            {leaderboardMode}
-
-            {leaderboard.map((player: {name:string, streak:number}, index: number) => {
+        <div className={'w-2/3 h-full text-center flex flex-col align-middle'}>
+            {leaderboard.map((player: {name:string, streak:number, highlight:boolean}, index: number) => {
                 return (
-                    <div key={index} className={'flex justify-around'}>
+                    <div key={index} className={`flex justify-between ${player.highlight ? 'text-yellow-500' : ''}`}>
                         <div>{player.name}</div>
                         <div>{player.streak}</div>
                     </div>

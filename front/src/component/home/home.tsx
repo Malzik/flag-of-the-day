@@ -68,7 +68,6 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, name, his
     useEffect(() => {
         setProfile({...profile, lang: profile.lang || currentLang, id})
         setPlayerName(name ?? '')
-        console.log(name)
     }, [id, name]);
 
     const toggleDarkMode = () => {
@@ -103,12 +102,6 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, name, his
 
     return (
         <div className={'w-full h-full text-center bg-blue-300 flex flex-col'}>
-            <div className='flex justify-between px-5 py-4 md:py-6 items-center container mx-auto'>
-                <span className={'font-extrabold'}>
-                {t('home.title')}
-                </span>
-                <FlameCounter count={streak ?? 0} points={points}/>
-            </div>
             <div
                 className={'py-5 flex-1 flex flex-col gap-5 text-2xl text-black dark:text-white bg-slate-100 dark:bg-slate-800 rounded-t-xl'}>
                 <div className='flex justify-between px-5 container mx-auto'>

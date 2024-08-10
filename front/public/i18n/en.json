@@ -52,6 +52,12 @@
       "Central Asia": "Central Asia"
     }
   },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "sort_by": "Sort by: ",
+    "streak": "Streak",
+    "points": "Points"
+  },
   "loading": "Loading...",
   "backToMenu": "Back to menu",
   "error": "An error occured: {error}",

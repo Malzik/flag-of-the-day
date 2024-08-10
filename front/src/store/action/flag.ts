@@ -224,12 +224,12 @@ export const updateName = (name: string, id: string) => {
     };
 };
 
-export const getLeaderboard = () => {
+export const getLeaderboard = (id: string) => {
     return async (dispatch: Dispatch) => {
         dispatch(startLeaderboardRequest());
 
         try {
-            const response = await fetch(apiUrl + '/leaderboard');
+            const response = await fetch(apiUrl + '/leaderboard?id=' + id);
             if (response.status >= 300) {
                 dispatch(startLeaderboardFailure(response));
             }

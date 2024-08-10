@@ -53,6 +53,12 @@
       "Central Asia": "Asie centrale"
     }
   },
+  "leaderboard": {
+    "title": "Classement",
+    "sort_by": "Trier par: ",
+    "streak": "Streak",
+    "points": "Points"
+  },
   "loading": "Chargement",
   "backToMenu": "Retour au menu",
   "error": "Une erreur est survenue: {error}",

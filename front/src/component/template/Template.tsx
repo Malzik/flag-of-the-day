@@ -4,9 +4,11 @@ import {Outlet} from "react-router-dom";
 
 export function Template() {
     return (
-        <div className={'bg-white dark:bg-black h-screen'}>
+        <div className={'bg-white dark:bg-black h-screen flex flex-col'}>
             <Header></Header>
-            <Outlet/>
+            <div className="flex-grow">
+                <Outlet/>
+            </div>
         </div>
     )
 }

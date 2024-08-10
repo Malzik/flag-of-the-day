@@ -1,7 +1,6 @@
 
 
 export function Button({label, onClick, element, width}:{label?:string, onClick: () => void, element?: JSX.Element, width?: string}) {
-    console.log(label)
     const style = width ?? 'w-48'
 
     return (
