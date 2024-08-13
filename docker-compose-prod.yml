@@ -1,8 +1,7 @@
 services:
   fotd-front:
     container_name: 'fotd-front'
-    build:
-      context: ./front
+    image: aheroin2/fotd-front:latest
     depends_on: [fotd-api]
     networks:
       - traefik_webgateway
@@ -29,8 +28,7 @@ services:
 
   fotd-api:
     container_name: 'fotd-api'
-    build:
-      context: ./back
+    image: aheroin2/fotd-api:latest
     depends_on: [fotd-db]
     restart: unless-stopped
     networks:
