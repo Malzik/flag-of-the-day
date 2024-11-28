@@ -82,3 +82,16 @@ func (s *PlayerService) UpdateName(player *model.Player, name string) *model.Pla
 	s.playerRepository.UpdatePlayer(player)
 	return player
 }
+
+func (s *PlayerService) FindByGoogleId(googleId string) *model.Player {
+	player, err := s.playerRepository.GetPlayerByGoogleId(googleId)
+	if err != nil {
+		return nil
+	}
+	return player
+}
+
+func (s *PlayerService) UpdatePlayer(player *model.Player) *model.Player {
+	s.playerRepository.UpdatePlayer(player)
+	return player
+}

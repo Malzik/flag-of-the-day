@@ -9,6 +9,10 @@ export function Template() {
             <div className="flex-grow">
                 <Outlet/>
             </div>
+            <nav>
+                <a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+                <a href="/terms-of-service.html" target="_blank" rel="noopener noreferrer">Terms of Service</a>
+            </nav>
         </div>
     )
 }

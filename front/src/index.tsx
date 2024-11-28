@@ -13,6 +13,7 @@ import WinComponent from "./component/flag/win/win";
 import LooseComponent from "./component/flag/loose/loose";
 import ErrorComponent from "./component/error/error";
 import LeaderboardComponent, {loader as leaderboardLoader} from "./component/leaderboard/leaderboard";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -51,16 +52,22 @@ const router = createBrowserRouter([
         ]
     }
 ]);
+
+const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || "";
 root.render(
-    <Provider store={store}>
-        <RouterProvider router={router} />
-    </Provider>
+    <React.StrictMode>
+      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+        <Provider store={store}>
+          <RouterProvider router={router} />
+        </Provider>
+      </GoogleOAuthProvider>
+    </React.StrictMode>
 );
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://cra.link/PWA
-serviceWorkerRegistration.register();
+serviceWorkerRegistration.unregister();
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

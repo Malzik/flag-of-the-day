@@ -67,6 +67,8 @@ func main() {
 
 	r.GET("/api/leaderboard", leaderboardController.HandleLeaderboard)
 
+	r.POST("/api/auth/google", playerController.HandleGoogleLoginToken)
+
 	// Start the HTTP server on port 8080
 	r.Run(":8082")
 }

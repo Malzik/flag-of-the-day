@@ -65,3 +65,11 @@ func (r *PlayerRepository) GetAllPlayers() []model.Player {
 	r.db.Find(&players)
 	return players
 }
+
+func (r *PlayerRepository) GetPlayerByGoogleId(googleId string) (*model.Player, error) {
+	var player model.Player
+	if err := r.db.Where("google_id = ?", googleId).First(&player).Error; err != nil {
+		return nil, err
+	}
+	return &player, nil
+}

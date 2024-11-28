@@ -3,3 +3,4 @@ back/.idea
 
 back/.env
 volumes
+node_modules/

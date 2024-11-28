@@ -13,6 +13,7 @@ import HistoryComponent from "./history/history";
 import EditNameComponent from "./name/editName";
 import {faTrophy} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import GoogleLoginButton from './google/GoogleLoginButton';
 const mapStateToProps = (state: RootState) => ({
     id: state.flag.profile?.id,
     streak: state.flag.profile?.streak,
@@ -20,7 +21,10 @@ const mapStateToProps = (state: RootState) => ({
     name: state.flag.profile?.name,
     history: state.flag.profile?.history,
     loading: state.flag.loading,
-    error: state.flag.error
+    error: state.flag.error,
+    player_id: state.auth.playerId,
+    authLoading: state.auth.loading,
+    authError: state.auth.error
 });
 
 const mapDispatchToProps = { getProfile, updateName };
@@ -47,7 +51,7 @@ export async function loader() {
 }
 
 const today = new Date().toLocaleDateString("en-US");
-const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, name, history, getProfile, updateName }) => {
+const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, name, history, getProfile, updateName, player_id, authLoading, authError }) => {
     let navigate = useNavigate();
     const [colorTheme, setTheme] = useDarkSide();
     const [darkSide, setDarkSide] = useState(colorTheme === 'light');
@@ -69,6 +73,15 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, name, his
         setProfile({...profile, lang: profile.lang || currentLang, id})
         setPlayerName(name ?? '')
     }, [id, name]);
+
+    useEffect(() => {
+        console.log('jere')
+        if (player_id && !authLoading && !authError) {
+            console.log('jere 2')
+            setProfile({...profile, id: player_id})
+            getProfile(player_id)
+        }
+    }, [player_id, authLoading]);
 
     const toggleDarkMode = () => {
         setTheme(colorTheme);
@@ -140,8 +153,9 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, name, his
                     <Button label={t('home.startGame')} onClick={() => startGame()}></Button>
                     <Button element={<FontAwesomeIcon icon={faTrophy} className="text-yellow-500"/>} onClick={() => goToLeadeboard()} width='w-14'></Button>
                 </div>
-                <div className={'text-sm container-sm mx-auto flex flex-col gap-3 md:gap-5 flex-1'}>
+                <div className={'text-sm container-sm mx-auto flex gap-3 md:gap-5 flex-1'}>
                     <EditNameComponent name={playerName} setName={setName}></EditNameComponent>
+                    <GoogleLoginButton />
                 </div>
             </div>
         </div>
