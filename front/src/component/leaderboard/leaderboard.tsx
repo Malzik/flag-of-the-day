@@ -57,17 +57,20 @@ const LeaderboardComponent: React.FC<PropsFromRedux> = ({leaderboards, loading})
     }
 
     return (
-        <div className={'w-full h-full text-center flex flex-col mb-5 mt-5'}>
-            <div className='text-2xl font-bold'>{t('leaderboard.title')}</div>
-            <div className='flex justify-center gap-5 py-5'>
-                <span>{t('leaderboard.sort_by')}</span>
-                <span className={`cursor-pointer ${streakStyle}`} onClick={() => setLeaderboardMode(LEADERBOARD_MODE.STREAK)}>{t('leaderboard.streak')}</span>
-                <span className={`cursor-pointer ${pointsStyle}`} onClick={() => setLeaderboardMode(LEADERBOARD_MODE.POINTS)}>{t('leaderboard.points')}</span>
-            </div>
-            <div className='flex justify-center'>
-                {leaderboardMode === LEADERBOARD_MODE.STREAK
-                    ? <LeaderboardStreakComponent leaderboard={streak}/>
-                    : <LeaderboardPointsComponent leaderboard={points}/>}
+        <div className={'w-full h-full text-center bg-blue-300 flex flex-col'}>
+            <div
+                className={'py-5 flex-1 flex flex-col gap-5 text-black dark:text-white bg-slate-100 dark:bg-slate-800 rounded-t-xl'}>
+                <div className='text-2xl font-bold'>{t('leaderboard.title')}</div>
+                <div className='flex justify-center gap-5 py-5'>
+                    <span>{t('leaderboard.sort_by')}</span>
+                    <span className={`cursor-pointer ${streakStyle}`} onClick={() => setLeaderboardMode(LEADERBOARD_MODE.STREAK)}>{t('leaderboard.streak')}</span>
+                    <span className={`cursor-pointer ${pointsStyle}`} onClick={() => setLeaderboardMode(LEADERBOARD_MODE.POINTS)}>{t('leaderboard.points')}</span>
+                </div>
+                <div className='flex justify-center'>
+                    {leaderboardMode === LEADERBOARD_MODE.STREAK
+                        ? <LeaderboardStreakComponent leaderboard={streak}/>
+                        : <LeaderboardPointsComponent leaderboard={points}/>}
+                </div>
             </div>
         </div>
     )

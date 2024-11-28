@@ -20,6 +20,7 @@ const mapStateToProps = (state: RootState) => ({
     points: state.flag.profile?.points,
     name: state.flag.profile?.name,
     history: state.flag.profile?.history,
+    isGoogleAccount: state.flag.profile?.isGoogleAccount,
     loading: state.flag.loading,
     error: state.flag.error,
     player_id: state.auth.playerId,
@@ -51,7 +52,7 @@ export async function loader() {
 }
 
 const today = new Date().toLocaleDateString("en-US");
-const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, name, history, getProfile, updateName, player_id, authLoading, authError }) => {
+const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, name, history, isGoogleAccount, getProfile, updateName, player_id, authLoading, authError }) => {
     let navigate = useNavigate();
     const [colorTheme, setTheme] = useDarkSide();
     const [darkSide, setDarkSide] = useState(colorTheme === 'light');
@@ -75,9 +76,7 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, name, his
     }, [id, name]);
 
     useEffect(() => {
-        console.log('jere')
         if (player_id && !authLoading && !authError) {
-            console.log('jere 2')
             setProfile({...profile, id: player_id})
             getProfile(player_id)
         }
@@ -95,7 +94,7 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, name, his
     }
 
     if (status === 'loading' || !profile.id) {
-        return (<div>{t('loading')}</div>)
+        return (<div className={'text-black dark:text-white bg-slate-100 dark:bg-slate-800'}>{t('loading')}</div>)
     }
 
     const updateLang = (lang: string) => {
@@ -153,9 +152,9 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, name, his
                     <Button label={t('home.startGame')} onClick={() => startGame()}></Button>
                     <Button element={<FontAwesomeIcon icon={faTrophy} className="text-yellow-500"/>} onClick={() => goToLeadeboard()} width='w-14'></Button>
                 </div>
-                <div className={'text-sm container-sm mx-auto flex gap-3 md:gap-5 flex-1'}>
+                <div className={'text-sm container-sm mx-auto flex gap-3 md:gap-5 flex-1 flex flex-col align-center'}>
                     <EditNameComponent name={playerName} setName={setName}></EditNameComponent>
-                    <GoogleLoginButton />
+                    { !isGoogleAccount ? <GoogleLoginButton /> : <></> }
                 </div>
             </div>
         </div>

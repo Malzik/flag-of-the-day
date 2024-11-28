@@ -14,10 +14,10 @@ const EditNameComponent: React.FC<EditNameProps> = ({name, setName}) => {
         setNameInput(name)
     }, [name])
     return (
-        <div className="flex items-center border rounded-md focus-within:border-blue-300 focus-within:ring-1">
+        <div className="flex items-center focus-within:border-blue-300 focus-within:ring-1">
             <input
                 type="text"
-                className="py-2 px-4 w-full rounded-l-md border-none focus:outline-none"
+                className="py-2 px-4 w-full rounded-l-md border-none focus:outline-none text-black dark:text-black"
                 value={nameInput}
                 onChange={(e) => setNameInput(e.target.value)}
             />

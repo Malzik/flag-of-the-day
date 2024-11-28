@@ -1,11 +1,12 @@
 package model
 
 type ProfileResponse struct {
-	Id      string    `json:"id"`
-	Streak  int       `json:"streak"`
-	Points  int       `json:"points"`
-	Name    string    `json:"name"`
-	History []History `json:"history"`
+	Id              string    `json:"id"`
+	Streak          int       `json:"streak"`
+	Points          int       `json:"points"`
+	Name            string    `json:"name"`
+	History         []History `json:"history"`
+	IsGoogleAccount bool      `json:"isGoogleAccount"`
 }
 
 type GuessResponse struct {

@@ -11,7 +11,7 @@ interface FlagState {
     answers: string[];
     isWin: boolean;
     isLoose: boolean;
-    profile: { id: string, streak: number, points: number, history: History[], name: string } | null;
+    profile: { id: string, streak: number, points: number, history: History[], name: string, isGoogleAccount: boolean } | null;
     tries: number;
     leaderboards: Leaderboards;
 }

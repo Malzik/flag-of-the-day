@@ -140,6 +140,10 @@ func (s *GameService) HandleGuess(date string, guess string, lang string, player
 	flags := s.CheckIfFlagsExistForToday(currentGame, err, date)
 
 	playerGame := s.gameRepository.GetPlayerGame(player, currentGame)
+	if playerGame == nil {
+		playerGame = &model.PlayerGame{PlayerId: player.Id, GameId: currentGame.Id}
+		s.gameRepository.CreatePlayerGame(playerGame)
+	}
 	if len(playerGame.IsWin) != 0 {
 		return model.GuessResponse{
 			CorrectGuess: false,

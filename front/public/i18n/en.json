@@ -7,7 +7,8 @@
     "try": "{tries} try",
     "tries": "{tries} tries",
     "lastScore": "My last games",
-    "welcome": "Welcome to your first game!"
+    "welcome": "Welcome to your first game!",
+    "points": "{points} pts"
   },
   "game": {
     "try": "Try n° {guesses} / {maxGuesses}",
