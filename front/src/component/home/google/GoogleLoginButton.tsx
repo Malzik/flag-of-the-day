@@ -9,10 +9,6 @@ const GoogleLoginButton: React.FC = () => {
   const dispatch = useDispatch();
 
   const handleLoginSuccess = (credentialResponse: any) => {
-    console.log(credentialResponse);
-    // Here you would typically send the credential to your backend
-    // and get a response with the user's information
-    // For now, we'll just dispatch a success action with the credential
     dispatch(identifyUser(credentialResponse, profile.id) as any);
   };
 

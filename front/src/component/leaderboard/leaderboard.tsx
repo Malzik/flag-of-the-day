@@ -3,9 +3,10 @@ import {connect, ConnectedProps} from "react-redux";
 import React, {useEffect, useState} from "react";
 import useTranslations from "../../i18n/useTranslation";
 import {LEADERBOARD_MODE} from "../../store/model/flag";
-import LeaderboardStreakComponent from "./leaderboardStreak";
-import LeaderboardPointsComponent from "./leaderboardPoints";
 import {getLeaderboard} from "../../store/action/flag";
+import {Button} from "../ui/button";
+import LeaderboardListComponent from "./leaderboardList";
+import Loader from "../ui/Loader";
 
 const mapStateToProps = (state: RootState) => ({
     loading: state.flag.loading,
@@ -29,26 +30,30 @@ export async function loader() {
         store.dispatch(getLeaderboard(id))
     }, 50)
 }
+
+const shadowStyle = "[box-shadow:0_6px_0_0_#1b6ff8,0_8px_0_0_#1b70f841]"
+
+const buttonUnselectedStyle = {
+    buttonClass: 'bg-blue-500 border-b-[1px] border-blue-400 h-8 md:h-12 ' + shadowStyle,
+    labelClass: 'text-white'
+}
+const buttonSelectedStyle = {
+    buttonClass: 'bg-white border border-blue-500 h-8 md:h-12 ' + shadowStyle,
+    labelClass: 'text-black'
+}
 const LeaderboardComponent: React.FC<PropsFromRedux> = ({leaderboards, loading}) => {
     const {t, init, status} = useTranslations()
     const [leaderboardMode, setLeaderboardMode] = useState(LEADERBOARD_MODE.STREAK)
-    const [points, setPoints] = useState(leaderboards.points)
-    const [streak, setStreak] = useState(leaderboards.streak)
-    const [streakStyle, setStreakStyle] = useState('underline')
-    const [pointsStyle, setPointsStyle] = useState('')
-
-    useEffect(() => {
-        setPoints(leaderboards.points)
-        setStreak(leaderboards.streak)
-    }, [leaderboards])
+    const [streakStyle, setStreakStyle] = useState(buttonSelectedStyle)
+    const [pointsStyle, setPointsStyle] = useState(buttonUnselectedStyle)
 
     useEffect(() => {
         if (leaderboardMode === LEADERBOARD_MODE.STREAK) {
-            setStreakStyle('underline')
-            setPointsStyle('')
+            setStreakStyle(buttonSelectedStyle)
+            setPointsStyle(buttonUnselectedStyle)
         } else {
-            setStreakStyle('')
-            setPointsStyle('underline')
+            setStreakStyle(buttonUnselectedStyle)
+            setPointsStyle(buttonSelectedStyle)
         }
     }, [leaderboardMode])
 
@@ -59,18 +64,13 @@ const LeaderboardComponent: React.FC<PropsFromRedux> = ({leaderboards, loading})
     return (
         <div className={'w-full h-full text-center bg-blue-300 flex flex-col'}>
             <div
-                className={'py-5 flex-1 flex flex-col gap-5 text-black dark:text-white bg-slate-100 dark:bg-slate-800 rounded-t-xl'}>
-                <div className='text-2xl font-bold'>{t('leaderboard.title')}</div>
-                <div className='flex justify-center gap-5 py-5'>
-                    <span>{t('leaderboard.sort_by')}</span>
-                    <span className={`cursor-pointer ${streakStyle}`} onClick={() => setLeaderboardMode(LEADERBOARD_MODE.STREAK)}>{t('leaderboard.streak')}</span>
-                    <span className={`cursor-pointer ${pointsStyle}`} onClick={() => setLeaderboardMode(LEADERBOARD_MODE.POINTS)}>{t('leaderboard.points')}</span>
+                className={'py-3 flex-1 flex flex-col gap-5 text-black dark:text-white bg-slate-100 dark:bg-slate-800 rounded-t-xl'}>
+                <div className='text-3xl font-bold md:py-3'>{t('leaderboard.title')}</div>
+                <div className='flex justify-center gap-5 w-80 md:w-full mx-auto'>
+                    <Button label={t('leaderboard.streak')} buttonClass={streakStyle.buttonClass} labelClass={streakStyle.labelClass} onClick={() => setLeaderboardMode(LEADERBOARD_MODE.STREAK)}></Button>
+                    <Button label={t('leaderboard.points')} buttonClass={pointsStyle.buttonClass} labelClass={pointsStyle.labelClass} onClick={() => setLeaderboardMode(LEADERBOARD_MODE.POINTS)}></Button>
                 </div>
-                <div className='flex justify-center'>
-                    {leaderboardMode === LEADERBOARD_MODE.STREAK
-                        ? <LeaderboardStreakComponent leaderboard={streak}/>
-                        : <LeaderboardPointsComponent leaderboard={points}/>}
-                </div>
+                {loading ? <div className={'py-8'}><Loader/></div> : <LeaderboardListComponent leaderboards={leaderboards} property={leaderboardMode as 'points' | 'streak'}/>}
             </div>
         </div>
     )

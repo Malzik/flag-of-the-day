@@ -4,12 +4,10 @@ import (
 	"back/model"
 	"back/service"
 	"context"
-	"fmt"
-	"net/http"
-	"os"
-
 	"github.com/gin-gonic/gin"
 	"google.golang.org/api/idtoken"
+	"net/http"
+	"os"
 )
 
 type UpdateNameRequest struct {
@@ -80,7 +78,6 @@ func (co *PlayerController) HandleGoogleLoginToken(c *gin.Context) {
 	googleID := payload.Subject
 	googlePlayer := co.playerService.FindByGoogleId(googleID)
 	if googlePlayer != nil {
-		fmt.Println(googlePlayer.Id)
 		c.JSON(http.StatusOK, gin.H{
 			"playerId": googlePlayer.Id,
 		})

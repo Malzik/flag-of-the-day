@@ -6,7 +6,6 @@ import (
 	"back/repository"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"golang.org/x/text/unicode/norm"
 	"gorm.io/gorm"
 	"math/rand"
@@ -50,7 +49,6 @@ func DrawThreeRandomFlags(flags []model.Flag) []model.Flag {
 func (s *GameService) CheckIfFlagsExistForToday(currentGame *model.Game, err error, date string) []model.Flag {
 	if err != nil {
 		flags := DrawThreeRandomFlags(s.Flags)
-		fmt.Println("Random Flags:", flags)
 
 		date, _ := time.Parse("2006-01-02", date)
 		currentGame = &model.Game{Date: date}

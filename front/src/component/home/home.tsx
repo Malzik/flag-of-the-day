@@ -14,6 +14,7 @@ import EditNameComponent from "./name/editName";
 import {faTrophy} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import GoogleLoginButton from './google/GoogleLoginButton';
+import Loader from "../ui/Loader";
 const mapStateToProps = (state: RootState) => ({
     id: state.flag.profile?.id,
     streak: state.flag.profile?.streak,
@@ -52,7 +53,7 @@ export async function loader() {
 }
 
 const today = new Date().toLocaleDateString("en-US");
-const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, name, history, isGoogleAccount, getProfile, updateName, player_id, authLoading, authError }) => {
+const HomeComponent: React.FC<PropsFromRedux> = ({ loading, id, name, history, isGoogleAccount, getProfile, updateName, player_id, authLoading, authError }) => {
     let navigate = useNavigate();
     const [colorTheme, setTheme] = useDarkSide();
     const [darkSide, setDarkSide] = useState(colorTheme === 'light');
@@ -60,6 +61,7 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, name, his
     const [currentDay, setCurrentDay] = useLocalStorage('currentDay', '')
     const [currentLang, setCurrentLang] = useState(navigator.language.split('-')[0])
     const [playerName, setPlayerName] = useState('')
+    const [isLoading, setIsLoading] = useState(loading)
     const {t, init, status} = useTranslations()
 
     useEffect(() => {
@@ -82,18 +84,24 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, name, his
         }
     }, [player_id, authLoading]);
 
+    useEffect(() => {
+        setIsLoading(loading)
+    }, [loading])
+
     const toggleDarkMode = () => {
         setTheme(colorTheme);
         setDarkSide(!darkSide);
     };
     const startGame = () => {
-        if (!currentDay[today]) {
-            setCurrentDay({[today]: { guessed: [], guesses: []}})
+        if (!isLoading) {
+            if (!currentDay[today]) {
+                setCurrentDay({[today]: { guessed: [], guesses: []}})
+            }
+            navigate("/game")
         }
-        navigate("/game")
     }
 
-    if (status === 'loading' || !profile.id) {
+    if (status === 'loading') {
         return (<div className={'text-black dark:text-white bg-slate-100 dark:bg-slate-800'}>{t('loading')}</div>)
     }
 
@@ -140,22 +148,24 @@ const HomeComponent: React.FC<PropsFromRedux> = ({ id, streak, points, name, his
                         </button>
                     </div>
                 </div>
-                {!!history ?
-                    <div className={'container mx-auto flex flex-col gap-3 md:gap-5 flex-1'}>
-                        <h2>{t('home.lastScore')}</h2>
-                        <div className='flex-1 w-full flex flex-col gap-4 px-5'>
-                            {history?.map((day, key) => (<HistoryComponent history={day} key={key}/>))}
-                        </div>
-                    </div> : <div className={"mt-16 mb-32"}>{t('home.welcome')}</div>
+                {isLoading ?
+                    <div className={'text-black dark:text-white bg-slate-100 dark:bg-slate-800'}><Loader/></div> :
+                    !!history ?
+                        <div className={'container mx-auto flex flex-col gap-3 md:gap-5 flex-1'}>
+                            <h2>{t('home.lastScore')}</h2>
+                            <div className='flex-1 w-full flex flex-col gap-4 px-5'>
+                                {history?.map((day, key) => (<HistoryComponent history={day} key={key}/>))}
+                            </div>
+                        </div> : <div className={"mt-16 mb-32"}>{t('home.welcome')}</div>
                 }
                 <div className='shrink-0 flex justify-center gap-5'>
-                    <Button label={t('home.startGame')} onClick={() => startGame()}></Button>
+                    <Button label={t('home.startGame')} disabled={isLoading} onClick={() => startGame()}></Button>
                     <Button element={<FontAwesomeIcon icon={faTrophy} className="text-yellow-500"/>} onClick={() => goToLeadeboard()} width='w-14'></Button>
                 </div>
-                <div className={'text-sm container-sm mx-auto flex gap-3 md:gap-5 flex-1 flex flex-col align-center'}>
+                {!isLoading && <div className={'text-sm container-sm mx-auto flex gap-3 md:gap-5 flex-1 flex flex-col align-center'}>
                     <EditNameComponent name={playerName} setName={setName}></EditNameComponent>
                     { !isGoogleAccount ? <GoogleLoginButton /> : <></> }
-                </div>
+                </div>}
             </div>
         </div>
     )

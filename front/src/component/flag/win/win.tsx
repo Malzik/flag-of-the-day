@@ -42,7 +42,7 @@ const WinComponent: React.FC<PropsFromRedux> = ({ randomFlags, answers, isWin, l
             <div className={'text-center dark:text-white mt-10 flex flex-col justify-around h-5/6'}>
                 <div>
                     <h2 className={'font-bold text-4xl flex justify-center'}>
-                        <img src="coupe.svg" alt="Coupe" className={'w-8 color-[#FCDC12]'}/>
+                        <img src="coupe.svg" alt="Coupe" className={'w-8'}/>
                         {t('win.title')}
                         <img src="coupe.svg" alt="Coupe" className={'w-8'}/>
                     </h2>

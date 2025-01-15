@@ -19,6 +19,6 @@ export const LEADERBOARD_MODE = {
     POINTS: 'points'
 }
 export interface Leaderboards {
-    points: {name: string, points: number}[];
-    streak: {name: string, streak: number}[];
+    points: {name: string, points: number, highlight: boolean}[];
+    streak: {name: string, streak: number, highlight: boolean}[];
 }
